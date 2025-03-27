@@ -361,10 +361,10 @@ int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag){
         impulseResetFlag = 0;
       }
       
-      if(bufOut[1] > 90 && bufOut[3] > 90) roverDirection = right;
+      if(bufOut[1] > 90 && bufOut[3] > 90) roverDirection = left;
       else if(bufOut[1] > 0 && bufOut[3] > 90) roverDirection = forward;
       else if(bufOut[1] > 90 && bufOut[3] > 0) roverDirection = backwards;  
-      else if(bufOut[1] > 0 && bufOut[3] > 0) roverDirection = left;
+      else if(bufOut[1] > 0 && bufOut[3] > 0) roverDirection = right;
       else roverDirection = none;
       
       
