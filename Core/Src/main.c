@@ -220,7 +220,8 @@ int checkCommandRov(char *str,int *time, int *speed){
       error = 1;
       return error; 
   }
-  if(str[0] != 'F' && str[0] != 'R' && str[0] != 'L' && str[0] != 'B' && str[0] != 'X' && str[0] != 'Z' && str[0] != 'C') {
+  if(str[0] != 'F' && str[0] != 'R' && str[0] != 'L' && str[0] != 'B' && str[0] != 'X' 
+     && str[0] != 'Z' && str[0] != 'C' && str[0] != 'Y' && str[0] != 'J' && str[0] != 'U' && str[0] != 'H')  {
     error = 1;
     return error;
   }
@@ -298,6 +299,38 @@ void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF],int speed){
     comBufOutRov[1][1] = realSpeed;
     comBufOutRov[2][1] = -1 * realSpeed;
     comBufOutRov[3][1] = realSpeed;
+  }
+  
+  //avanti sx in diagonale
+  if(str[0] == 'Y'){
+    comBufOutRov[0][1] = 0;
+    comBufOutRov[1][1] = -1 * realSpeed;
+    comBufOutRov[2][1] = -1 * realSpeed;
+    comBufOutRov[3][1] = 0;
+  }
+  
+  //avanti dx in diagonale
+  if(str[0] == 'U'){
+    comBufOutRov[0][1] = realSpeed;
+    comBufOutRov[1][1] = 0;
+    comBufOutRov[2][1] = 0;
+    comBufOutRov[3][1] = realSpeed;
+  }
+  
+  //indietro dx in diagonale
+  if(str[0] == 'J'){
+    comBufOutRov[0][1] = 0;
+    comBufOutRov[1][1] = realSpeed;
+    comBufOutRov[2][1] = realSpeed;
+    comBufOutRov[3][1] = 0;
+  }
+  
+  //indietro xs in diagonale
+  if(str[0] == 'H'){
+    comBufOutRov[0][1] = -1 * realSpeed;
+    comBufOutRov[1][1] = 0;
+    comBufOutRov[2][1] = 0;
+    comBufOutRov[3][1] = -1 * realSpeed;
   }
   
   if(str[0] == 'X'){

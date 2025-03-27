@@ -248,3 +248,17 @@
 2	572	7647960437281009	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Obj/Application/User/Core/main.o	6b82efd6a5a6c289
 579	736	7647960439005059	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Exe/LED_V1.out	e4cbecac09d737b3
 759	846	7647960440105406	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Exe/LED_V1.hex	fefb82ea4a35aaa7
+144	932	7647992913721230	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Obj/Application/User/Core/stm32h7xx_it.o	34fe9fbca861bce1
+7	952	7647992913869701	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Obj/Application/User/Core/stm32h7xx_hal_msp.o	80b9cba6d9dc2d38
+140	1103	7647992915447373	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Obj/Application/User/Core/main.o	6b82efd6a5a6c289
+1109	1465	7647992919104748	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Exe/LED_V1.out	e4cbecac09d737b3
+1487	1559	7647992920202978	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Exe/LED_V1.hex	fefb82ea4a35aaa7
+6	534	7648003846323281	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Obj/Application/User/Core/main.o	6b82efd6a5a6c289
+540	674	7648003847788530	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Exe/LED_V1.out	e4cbecac09d737b3
+692	711	7648003848258015	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Exe/LED_V1.hex	fefb82ea4a35aaa7
+2	410	7648005357572102	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Obj/Application/User/Core/main.o	6b82efd6a5a6c289
+415	540	7648005358828628	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Exe/LED_V1.out	e4cbecac09d737b3
+558	574	7648005359302735	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Exe/LED_V1.hex	fefb82ea4a35aaa7
+2	475	7648007572880429	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Obj/Application/User/Core/main.o	6b82efd6a5a6c289
+480	598	7648007574179427	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Exe/LED_V1.out	e4cbecac09d737b3
+616	632	7648007574620254	C:/Users/lorrn/Desktop/Tirocinio/STM32H743/RXModeLed/EWARM/LED_V1/Exe/LED_V1.hex	fefb82ea4a35aaa7
