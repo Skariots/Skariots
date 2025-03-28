@@ -8,3 +8,13 @@ C:\Users\lorrn\Desktop\Tirocinio\controlloRoverApp\roverControl\bin\Debug\roverC
 C:\Users\lorrn\Desktop\Tirocinio\controlloRoverApp\roverControl\bin\Debug\roverControl.pdb
 C:\Users\lorrn\Desktop\Tirocinio\controlloRoverApp\roverControl\obj\Debug\roverControl.exe
 C:\Users\lorrn\Desktop\Tirocinio\controlloRoverApp\roverControl\obj\Debug\roverControl.pdb
+C:\Users\lorrn\Desktop\Tirocinio\STM32H743\RXModeLed\controlloRoverApp\roverControl\bin\Debug\roverControl.exe.config
+C:\Users\lorrn\Desktop\Tirocinio\STM32H743\RXModeLed\controlloRoverApp\roverControl\bin\Debug\roverControl.exe
+C:\Users\lorrn\Desktop\Tirocinio\STM32H743\RXModeLed\controlloRoverApp\roverControl\bin\Debug\roverControl.pdb
+C:\Users\lorrn\Desktop\Tirocinio\STM32H743\RXModeLed\controlloRoverApp\roverControl\obj\Debug\roverControl.csproj.AssemblyReference.cache
+C:\Users\lorrn\Desktop\Tirocinio\STM32H743\RXModeLed\controlloRoverApp\roverControl\obj\Debug\roverControl.ROVER.resources
+C:\Users\lorrn\Desktop\Tirocinio\STM32H743\RXModeLed\controlloRoverApp\roverControl\obj\Debug\roverControl.Properties.Resources.resources
+C:\Users\lorrn\Desktop\Tirocinio\STM32H743\RXModeLed\controlloRoverApp\roverControl\obj\Debug\roverControl.csproj.GenerateResource.cache
+C:\Users\lorrn\Desktop\Tirocinio\STM32H743\RXModeLed\controlloRoverApp\roverControl\obj\Debug\roverControl.csproj.CoreCompileInputs.cache
+C:\Users\lorrn\Desktop\Tirocinio\STM32H743\RXModeLed\controlloRoverApp\roverControl\obj\Debug\roverControl.exe
+C:\Users\lorrn\Desktop\Tirocinio\STM32H743\RXModeLed\controlloRoverApp\roverControl\obj\Debug\roverControl.pdb

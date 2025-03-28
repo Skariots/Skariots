@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,26 +17,38 @@ namespace roverControl
     {
         private int numPort;
         private String comOutBuf;
+        private string comInBufGyro;
+        private Byte[] tmpGyro;
         private int roverSpeed;
         private HashSet<Keys> pressedKeys;
+        private float startTargetAngle;
+        private float angleReceived;
+        private int numBytesReceived;
         public ROVER()
         {
             InitializeComponent();
             
             this.numPort = 0;
             this.comOutBuf = null;
+            this.comInBufGyro = null;
+            this.tmpGyro = new byte[1];
             this.roverSpeed = 1;
-            pressedKeys = new HashSet<Keys>();
+            this.pressedKeys = new HashSet<Keys>();
+            this.angleReceived = 0;
+            this.startTargetAngle = 0;
+            this.numBytesReceived = 0;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            int i = 0;
             if (serialPort.IsOpen)
             {
                 try
                 {
                     serialPort.Close();
                     connectButton.Text = "CONNECT";
+                    commandTimer.Enabled = false;   
                 }
                 catch { };
             }
@@ -44,7 +57,7 @@ namespace roverControl
                 int.TryParse(portBox.Text, out this.numPort);
                 if (numPort == 0)
                 {
-                    for (int i = 1; i < 9; i++)
+                    for (i = 1; i < 10; i++)
                     {
                         try
                         {
@@ -76,6 +89,27 @@ namespace roverControl
                         commandTimer.Enabled = true;
                     }
                 }      
+            }
+
+            if (!gyroPort.IsOpen)
+            {
+                for(int j = i;j < 10; j++)
+                {
+                    try
+                    {
+                        gyroPort.PortName = "COM" + j;
+                        gyroPort.Open();
+                        gyroTimer.Enabled = true;
+                        orientationBox.Text = "0";
+                        break;
+                    }
+                    catch { };
+                }
+            }
+            else
+            {
+                gyroPort.Close();
+                gyroTimer.Enabled= false;
             }
         }
 
@@ -116,8 +150,20 @@ namespace roverControl
                 this.rightButton.BackColor = Color.LightGray;
                 this.pressedKeys.Add(e.KeyCode);
             }
+            if (e.KeyCode == Keys.Q && this.pressedKeys.Count == 0)
+            {
+                comOutBuf = "Z" + this.roverSpeed;
+                this.rotateLeftButton.BackColor = Color.LightGray;
+                this.pressedKeys.Add(e.KeyCode);
+            }
+            if (e.KeyCode == Keys.E && this.pressedKeys.Count == 0)
+            {
+                comOutBuf = "C" + this.roverSpeed;
+                this.rotateRightButton.BackColor = Color.LightGray;
+                this.pressedKeys.Add(e.KeyCode);
+            }
 
-            if (e.KeyCode == Keys.Q)
+            if (e.KeyCode == Keys.R)
             {
                 if(this.roverSpeed < 9)
                 {
@@ -126,7 +172,7 @@ namespace roverControl
                 }
             }
 
-            if (e.KeyCode == Keys.E)
+            if (e.KeyCode == Keys.T)
             {
                 if (this.roverSpeed > 1)
                 {
@@ -146,7 +192,22 @@ namespace roverControl
                 this.leftButton.BackColor = Control.DefaultBackColor;
                 this.pressedKeys.Remove(e.KeyCode);
             }
-            if(e.KeyCode == Keys.G)
+
+            if (e.KeyCode == Keys.Q)
+            {
+                comOutBuf = "X\n";
+                this.rotateLeftButton.BackColor = Control.DefaultBackColor;
+                this.pressedKeys.Remove(e.KeyCode);
+            }
+
+            if (e.KeyCode == Keys.E)
+            {
+                comOutBuf = "X\n";
+                this.rotateRightButton.BackColor = Control.DefaultBackColor;
+                this.pressedKeys.Remove(e.KeyCode);
+            }
+
+            if (e.KeyCode == Keys.G)
             {
                 comOutBuf = "G\n";
             }
@@ -164,7 +225,24 @@ namespace roverControl
 
         private void gyroPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
+            comInBufGyro = gyroPort.ReadLine();
+            //controllo se i dati rappresentano un numero valido
+            /*
+            if (tmpGyro[0] > 44 && tmpGyro[0] < 58 && tmpGyro[0] != 47)
+            {
+                comInBufGyro.Append((char)tmpGyro[0]);
+                numBytesReceived++;
+            }
+            */   
+        }
 
+        private void gyroTimer_Tick(object sender, EventArgs e)
+        {
+            if (float.TryParse(comInBufGyro, NumberStyles.Float, CultureInfo.InvariantCulture, out this.angleReceived))
+            {
+                this.orientationBox.Text = this.angleReceived.ToString("F2", CultureInfo.InvariantCulture);
+            }
+            this.comInBufGyro = null;
         }
     }
 }

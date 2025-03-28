@@ -43,6 +43,11 @@
             this.goBackButton = new System.Windows.Forms.Button();
             this.resetButton = new System.Windows.Forms.Button();
             this.gyroPort = new System.IO.Ports.SerialPort(this.components);
+            this.orientationBox = new System.Windows.Forms.TextBox();
+            this.orientationLabel = new System.Windows.Forms.Label();
+            this.gyroTimer = new System.Windows.Forms.Timer(this.components);
+            this.rotateRightButton = new System.Windows.Forms.Button();
+            this.rotateLeftButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // serialPort
@@ -164,7 +169,7 @@
             // 
             // resetButton
             // 
-            this.resetButton.Location = new System.Drawing.Point(200, 250);
+            this.resetButton.Location = new System.Drawing.Point(306, 190);
             this.resetButton.Name = "resetButton";
             this.resetButton.Size = new System.Drawing.Size(100, 33);
             this.resetButton.TabIndex = 10;
@@ -174,13 +179,61 @@
             // 
             // gyroPort
             // 
+            this.gyroPort.BaudRate = 115200;
             this.gyroPort.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.gyroPort_DataReceived);
+            // 
+            // orientationBox
+            // 
+            this.orientationBox.Location = new System.Drawing.Point(89, 79);
+            this.orientationBox.Name = "orientationBox";
+            this.orientationBox.ReadOnly = true;
+            this.orientationBox.Size = new System.Drawing.Size(90, 22);
+            this.orientationBox.TabIndex = 11;
+            this.orientationBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // orientationLabel
+            // 
+            this.orientationLabel.AutoSize = true;
+            this.orientationLabel.Location = new System.Drawing.Point(12, 85);
+            this.orientationLabel.Name = "orientationLabel";
+            this.orientationLabel.Size = new System.Drawing.Size(71, 16);
+            this.orientationLabel.TabIndex = 12;
+            this.orientationLabel.Text = "Orientation";
+            // 
+            // gyroTimer
+            // 
+            this.gyroTimer.Interval = 500;
+            this.gyroTimer.Tick += new System.EventHandler(this.gyroTimer_Tick);
+            // 
+            // rotateRightButton
+            // 
+            this.rotateRightButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 19.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rotateRightButton.Location = new System.Drawing.Point(183, 260);
+            this.rotateRightButton.Name = "rotateRightButton";
+            this.rotateRightButton.Size = new System.Drawing.Size(50, 50);
+            this.rotateRightButton.TabIndex = 13;
+            this.rotateRightButton.Text = "↷";
+            this.rotateRightButton.UseVisualStyleBackColor = true;
+            // 
+            // rotateLeftButton
+            // 
+            this.rotateLeftButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 19.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rotateLeftButton.Location = new System.Drawing.Point(71, 260);
+            this.rotateLeftButton.Name = "rotateLeftButton";
+            this.rotateLeftButton.Size = new System.Drawing.Size(50, 50);
+            this.rotateLeftButton.TabIndex = 14;
+            this.rotateLeftButton.Text = "↶";
+            this.rotateLeftButton.UseVisualStyleBackColor = true;
             // 
             // ROVER
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(964, 570);
+            this.Controls.Add(this.rotateLeftButton);
+            this.Controls.Add(this.rotateRightButton);
+            this.Controls.Add(this.orientationLabel);
+            this.Controls.Add(this.orientationBox);
             this.Controls.Add(this.resetButton);
             this.Controls.Add(this.goBackButton);
             this.Controls.Add(this.speedBox);
@@ -220,6 +273,11 @@
         private System.Windows.Forms.Button goBackButton;
         private System.Windows.Forms.Button resetButton;
         private System.IO.Ports.SerialPort gyroPort;
+        private System.Windows.Forms.TextBox orientationBox;
+        private System.Windows.Forms.Label orientationLabel;
+        private System.Windows.Forms.Timer gyroTimer;
+        private System.Windows.Forms.Button rotateRightButton;
+        private System.Windows.Forms.Button rotateLeftButton;
     }
 }
 

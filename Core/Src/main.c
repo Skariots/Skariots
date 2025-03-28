@@ -15,7 +15,6 @@ int checkCommandRov(char *str, int *time, int *speed);
 void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF], int speed);
 int checkCommand(char *str);
 void goBack();
-int calibrate();
 
 typedef enum state{ off = 0, on = 1} State;
 typedef enum direction{forward = 0, right = 1, backwards = 2, left = 3, none = 4} Direction;
@@ -53,9 +52,6 @@ int impulseResetFlag;
 int commandReceivedFlag;  //flag di interruzione se si riceve un comando durante il goBack()
 int checkRx;
 Direction roverDirection;
-
-//controllo direzionale
-float startTargetAngle;
 
 int bufOutReady;
 
@@ -98,7 +94,6 @@ int main(void)
   commandReceivedFlag = 0;
   roverDirection = none;
   bufOutReady = 1;
-  startTargetAngle = 0;
   
   HAL_UART_Receive_IT(&huart3,comINbuf,1); //riceve il primo byte e fa scattare interrupt
   
@@ -428,11 +423,6 @@ void goBack(){
   impulseCountEngRight = 0;
   checkRx = 0;
   commandReceivedFlag = 0;
-}
-
-int calibrate(){
-  int target = 0;
-  return target;
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
