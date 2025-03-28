@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -23,7 +24,8 @@ namespace roverControl
         private HashSet<Keys> pressedKeys;
         private float startTargetAngle;
         private float angleReceived;
-        private int numBytesReceived;
+        private Boolean testRunning;
+        int countCs;
         public ROVER()
         {
             InitializeComponent();
@@ -36,7 +38,8 @@ namespace roverControl
             this.pressedKeys = new HashSet<Keys>();
             this.angleReceived = 0;
             this.startTargetAngle = 0;
-            this.numBytesReceived = 0;
+            this.testRunning = false;
+            this.countCs = 0;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -193,6 +196,7 @@ namespace roverControl
                 this.pressedKeys.Remove(e.KeyCode);
             }
 
+            ////la funzione go back si bugga quando chiamata dopo una rotazione///////////////////////
             if (e.KeyCode == Keys.Q)
             {
                 comOutBuf = "X\n";
@@ -225,7 +229,10 @@ namespace roverControl
 
         private void gyroPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
-            comInBufGyro = gyroPort.ReadLine();
+            try{
+                comInBufGyro = gyroPort.ReadLine();
+            }
+            catch{ };
             //controllo se i dati rappresentano un numero valido
             /*
             if (tmpGyro[0] > 44 && tmpGyro[0] < 58 && tmpGyro[0] != 47)
@@ -243,6 +250,47 @@ namespace roverControl
                 this.orientationBox.Text = this.angleReceived.ToString("F2", CultureInfo.InvariantCulture);
             }
             this.comInBufGyro = null;
+            this.gyroPort.DiscardInBuffer();
+
+            if (testRunning)
+            {
+                if (this.angleReceived - startTargetAngle > 10.0)
+                {
+                    comOutBuf = "N" + this.roverSpeed.ToString();
+                    //comOutBuf = "N" + this.roverSpeed.ToString(); // sostituire con funzioni che correggono la traiettoria per un tempo T, proporzionale alla velocità, (da calcolare)
+                }
+                else if (this.angleReceived - startTargetAngle < 10.0)
+                {
+                    comOutBuf = "M" + this.roverSpeed.ToString();
+                }
+                else
+                {
+                    comOutBuf = "F" + this.roverSpeed.ToString();
+                }
+            }      
+        }
+
+        private void startTestButton_Click(object sender, EventArgs e)
+        {
+            this.testRunning = true;
+            this.timerCS.Enabled = true;
+            startTargetAngle = 0;
+        }
+
+        private void stopTestButton_Click(object sender, EventArgs e)
+        {
+            comOutBuf = "X\n";
+            this.testRunning = false;
+            this.timerCS.Enabled = false;
+        }
+
+        private void timerCS_Tick(object sender, EventArgs e)
+        {
+            countCs++;
+            if (countCs >= 100 && testRunning == true) {
+                comOutBuf = "X\n";
+                testRunning = false;
+            }
         }
     }
 }

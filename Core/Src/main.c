@@ -2,6 +2,7 @@
 
 #define RXSIZEBUF 128
 #define DEVICE_ADDRESS 0x34
+#define OFFSET_TO_SPEED 0.5
 
 void SystemClock_Config(void);
 static void MPU_Config(void);
@@ -216,7 +217,7 @@ int checkCommandRov(char *str,int *time, int *speed){
       return error; 
   }
   if(str[0] != 'F' && str[0] != 'R' && str[0] != 'L' && str[0] != 'B' && str[0] != 'X' 
-     && str[0] != 'Z' && str[0] != 'C' && str[0] != 'Y' && str[0] != 'J' && str[0] != 'U' && str[0] != 'H')  {
+     && str[0] != 'Z' && str[0] != 'C' && str[0] != 'Y' && str[0] != 'J' && str[0] != 'U' && str[0] != 'H' && str[0] != 'N' && str[0] != 'M')  {
     error = 1;
     return error;
   }
@@ -244,7 +245,7 @@ int checkCommandRov(char *str,int *time, int *speed){
 void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF],int speed){
   //speed valori da 0 a 9 -> solo valori positivi della velocità 0-> 130 9->255
   
-  
+  //0 -> dx dietro, 1 -> dx avanti, 2 -> sx dietro, 3 -> sx avanti
   int realSpeed = (speed * 10) % 91;
   
   if(str[0] == 'G'){
@@ -326,6 +327,22 @@ void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF],int speed){
     comBufOutRov[1][1] = 0;
     comBufOutRov[2][1] = 0;
     comBufOutRov[3][1] = -1 * realSpeed;
+  }
+  
+  //stabilizza direzione verso sinistra
+  if(str[0] == 'N'){
+    comBufOutRov[0][1] = realSpeed;
+    comBufOutRov[1][1] = (-1 * realSpeed) - (OFFSET_TO_SPEED * realSpeed);
+    comBufOutRov[2][1] = -1 * realSpeed;
+    comBufOutRov[3][1] = realSpeed;
+  }
+  
+  //stabilizza direzione verso destra
+  if(str[0] == 'M'){
+    comBufOutRov[0][1] = realSpeed;
+    comBufOutRov[1][1] = -1 * realSpeed;
+    comBufOutRov[2][1] = -1 * realSpeed;
+    comBufOutRov[3][1] = realSpeed + (OFFSET_TO_SPEED * realSpeed);
   }
   
   if(str[0] == 'X'){

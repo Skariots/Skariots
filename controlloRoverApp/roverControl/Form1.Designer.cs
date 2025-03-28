@@ -48,6 +48,9 @@
             this.gyroTimer = new System.Windows.Forms.Timer(this.components);
             this.rotateRightButton = new System.Windows.Forms.Button();
             this.rotateLeftButton = new System.Windows.Forms.Button();
+            this.startTestButton = new System.Windows.Forms.Button();
+            this.stopTestButton = new System.Windows.Forms.Button();
+            this.timerCS = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // serialPort
@@ -225,11 +228,38 @@
             this.rotateLeftButton.Text = "↶";
             this.rotateLeftButton.UseVisualStyleBackColor = true;
             // 
+            // startTestButton
+            // 
+            this.startTestButton.Location = new System.Drawing.Point(306, 281);
+            this.startTestButton.Name = "startTestButton";
+            this.startTestButton.Size = new System.Drawing.Size(152, 23);
+            this.startTestButton.TabIndex = 15;
+            this.startTestButton.Text = "START TEST";
+            this.startTestButton.UseVisualStyleBackColor = true;
+            this.startTestButton.Click += new System.EventHandler(this.startTestButton_Click);
+            // 
+            // stopTestButton
+            // 
+            this.stopTestButton.Location = new System.Drawing.Point(306, 322);
+            this.stopTestButton.Name = "stopTestButton";
+            this.stopTestButton.Size = new System.Drawing.Size(152, 23);
+            this.stopTestButton.TabIndex = 16;
+            this.stopTestButton.Text = "STOP TEST";
+            this.stopTestButton.UseVisualStyleBackColor = true;
+            this.stopTestButton.Click += new System.EventHandler(this.stopTestButton_Click);
+            // 
+            // timerCS
+            // 
+            this.timerCS.Interval = 10;
+            this.timerCS.Tick += new System.EventHandler(this.timerCS_Tick);
+            // 
             // ROVER
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(964, 570);
+            this.Controls.Add(this.stopTestButton);
+            this.Controls.Add(this.startTestButton);
             this.Controls.Add(this.rotateLeftButton);
             this.Controls.Add(this.rotateRightButton);
             this.Controls.Add(this.orientationLabel);
@@ -278,6 +308,9 @@
         private System.Windows.Forms.Timer gyroTimer;
         private System.Windows.Forms.Button rotateRightButton;
         private System.Windows.Forms.Button rotateLeftButton;
+        private System.Windows.Forms.Button startTestButton;
+        private System.Windows.Forms.Button stopTestButton;
+        private System.Windows.Forms.Timer timerCS;
     }
 }
 
