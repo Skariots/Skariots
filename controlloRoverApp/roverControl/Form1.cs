@@ -23,8 +23,12 @@ namespace roverControl
         private int roverSpeed;
         private HashSet<Keys> pressedKeys;
         private float startTargetAngle;
-        private float angleReceived;
+        private float []anglesReceived;
+        private float currentAngle;
+        private float lastAngle;
         private Boolean testRunning;
+        private Boolean adjusting;
+        private Boolean simulationStartFlag;
         int countCs;
         public ROVER()
         {
@@ -36,9 +40,13 @@ namespace roverControl
             this.tmpGyro = new byte[1];
             this.roverSpeed = 1;
             this.pressedKeys = new HashSet<Keys>();
-            this.angleReceived = 0;
+            this.anglesReceived = new float[5];
+            this.currentAngle = 0;
+            this.lastAngle = 0;
             this.startTargetAngle = 0;
             this.testRunning = false;
+            this.adjusting = false;
+            this.simulationStartFlag = false;
             this.countCs = 0;
         }
 
@@ -215,6 +223,11 @@ namespace roverControl
             {
                 comOutBuf = "G\n";
             }
+
+            if (e.KeyCode == Keys.P)
+            {
+                this.startTargetAngle = this.currentAngle;
+            }
         }
 
         private void resetButton_Click(object sender, EventArgs e)
@@ -245,51 +258,90 @@ namespace roverControl
 
         private void gyroTimer_Tick(object sender, EventArgs e)
         {
-            if (float.TryParse(comInBufGyro, NumberStyles.Float, CultureInfo.InvariantCulture, out this.angleReceived))
+            /*
+            int currentIndexAngle = this.anglesReceived.Length;
+            if(currentIndexAngle >= 5)
             {
-                this.orientationBox.Text = this.angleReceived.ToString("F2", CultureInfo.InvariantCulture);
+                for(int i = 0; i < 4; i++)
+                {
+                    this.anglesReceived[i] = this.anglesReceived[i + 1];
+                }
+                currentIndexAngle = 4;
+            }
+            
+            this.mediumAngle = anglesReceived.Average();
+            */
+            if (float.TryParse(comInBufGyro, NumberStyles.Float, CultureInfo.InvariantCulture, out float angle))
+            {
+                this.currentAngle = angle;
             }
             this.comInBufGyro = null;
             this.gyroPort.DiscardInBuffer();
 
-            if (testRunning)
+            while(this.currentAngle - this.lastAngle < -180)
             {
-                if (this.angleReceived - startTargetAngle > 10.0)
-                {
-                    comOutBuf = "N" + this.roverSpeed.ToString();
-                    //comOutBuf = "N" + this.roverSpeed.ToString(); // sostituire con funzioni che correggono la traiettoria per un tempo T, proporzionale alla velocità, (da calcolare)
-                }
-                else if (this.angleReceived - startTargetAngle < 10.0)
-                {
-                    comOutBuf = "M" + this.roverSpeed.ToString();
-                }
-                else
-                {
-                    comOutBuf = "F" + this.roverSpeed.ToString();
-                }
-            }      
+                this.currentAngle += 360;
+            }
+            while(this.currentAngle - this.lastAngle > 180)
+            {
+                this.currentAngle -= 360;
+            }
+            
+            this.lastAngle = this.currentAngle;
+            this.orientationBox.Text = this.currentAngle.ToString("F2", CultureInfo.InvariantCulture);
         }
 
         private void startTestButton_Click(object sender, EventArgs e)
         {
             this.testRunning = true;
             this.timerCS.Enabled = true;
-            startTargetAngle = 0;
+            this.countCs = 0;
+            this.adjusting = false;
+            this.simulationStartFlag = true;
+            //this.startTargetAngle = 0; 
         }
 
         private void stopTestButton_Click(object sender, EventArgs e)
-        {
-            comOutBuf = "X\n";
+        {       
             this.testRunning = false;
             this.timerCS.Enabled = false;
+            this.countCs = 0;
+            this.comOutBuf = "X\n";
         }
 
         private void timerCS_Tick(object sender, EventArgs e)
         {
-            countCs++;
-            if (countCs >= 100 && testRunning == true) {
-                comOutBuf = "X\n";
-                testRunning = false;
+            if (testRunning)
+            {
+                if(adjusting)
+                {
+                    this.countCs++;
+                }
+                if(this.countCs >= 50 || this.countCs == 0)
+                {
+                    if (this.currentAngle - startTargetAngle > 10.0)
+                    {
+                        this.adjusting = true;
+                        this.countCs = 0;
+                        comOutBuf = "N" + this.roverSpeed.ToString();
+                    }
+                    else if (this.currentAngle - startTargetAngle < -10.0)
+                    {
+                        this.adjusting = true;
+                        this.countCs = 0;
+                        comOutBuf = "M" + this.roverSpeed.ToString();
+                    }
+                    else if (this.currentAngle - startTargetAngle < 10.0 && this.currentAngle - startTargetAngle > -10.0 && (adjusting || this.simulationStartFlag)) //flag adjusting per non intasare il buffer
+                    {
+                        comOutBuf = "F" + this.roverSpeed.ToString();
+                        //this.testRunning = false;
+                        //this.timerCS.Enabled = false;
+                        this.countCs = 0;
+                        this.adjusting = false;
+                        //this.comOutBuf = "X\n";
+                    }
+                }
+                this.simulationStartFlag = false;
             }
         }
     }

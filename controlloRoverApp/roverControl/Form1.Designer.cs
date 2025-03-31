@@ -80,7 +80,6 @@
             // 
             // commandTimer
             // 
-            this.commandTimer.Interval = 30;
             this.commandTimer.Tick += new System.EventHandler(this.commandTimer_Tick);
             // 
             // forwardButton

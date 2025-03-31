@@ -2,7 +2,7 @@
 
 #define RXSIZEBUF 128
 #define DEVICE_ADDRESS 0x34
-#define OFFSET_TO_SPEED 0.5
+#define OFFSET_TO_SPEED 0.20
 
 void SystemClock_Config(void);
 static void MPU_Config(void);
@@ -331,7 +331,7 @@ void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF],int speed){
   
   //stabilizza direzione verso sinistra
   if(str[0] == 'N'){
-    comBufOutRov[0][1] = realSpeed;
+    comBufOutRov[0][1] = realSpeed + (OFFSET_TO_SPEED * realSpeed);
     comBufOutRov[1][1] = (-1 * realSpeed) - (OFFSET_TO_SPEED * realSpeed);
     comBufOutRov[2][1] = -1 * realSpeed;
     comBufOutRov[3][1] = realSpeed;
@@ -341,7 +341,7 @@ void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF],int speed){
   if(str[0] == 'M'){
     comBufOutRov[0][1] = realSpeed;
     comBufOutRov[1][1] = -1 * realSpeed;
-    comBufOutRov[2][1] = -1 * realSpeed;
+    comBufOutRov[2][1] = (-1 * realSpeed) - (OFFSET_TO_SPEED * realSpeed);
     comBufOutRov[3][1] = realSpeed + (OFFSET_TO_SPEED * realSpeed);
   }
   
@@ -351,6 +351,8 @@ void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF],int speed){
     comBufOutRov[2][1] = 0;
     comBufOutRov[3][1] = 0;
   }
+  
+  
 }
 int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag){
       uint8_t bufOut[8];
