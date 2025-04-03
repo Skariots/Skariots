@@ -3,6 +3,7 @@
 #define RXSIZEBUF 128
 #define DEVICE_ADDRESS 0x34
 #define OFFSET_TO_SPEED 0.20
+#define PI 3.14159265
 
 void SystemClock_Config(void);
 static void MPU_Config(void);
@@ -12,8 +13,10 @@ void Timer_Init();
 void I2C_Init();
 void Init_RovBuf(uint8_t commandBufOutRov[4][RXSIZEBUF]);
 int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag);
-int checkCommandRov(char *str, int *time, int *speed);
-void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF], int speed);
+int checkCommandRov(char *str, int *time, int *speed,int *direction_rov, float *angular_rate_rov);
+void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF], int speed,int direction_rov, float angular_rate_rov);
+void setVelocity(int velocity, int direction, float angular_rate, int fake);
+void speedConvert(float *v_s);
 int checkCommand(char *str);
 void goBack();
 
@@ -38,8 +41,10 @@ int status = 0;
 int errorCommandRover;
 int moveTick = 0;
 int timeRov = 0;
-//int timePrintImpulse;
+
 int speedRov = 0;
+float angular_rate_rov= 0; //per la funzione che si occupa di sterzare (da convertire da 0 a 9 a valori rad/s)
+int direction_rov = 0;
 int timeCountRov = 0; //tempo per far fermare i comandi
 char bufCheck[RXSIZEBUF];
 uint8_t commandBufOutRov[4][RXSIZEBUF];
@@ -55,6 +60,19 @@ int checkRx;
 Direction roverDirection;
 
 int bufOutReady;
+
+typedef struct{
+  float a;
+  float b;
+  float velocity;
+  int direction;
+  float angular_rate;
+  float wheel_diameter;
+  float pulse_per_cycle;
+  float speed_to_mm;
+}RoverInfo;
+
+RoverInfo rover;
 
 uint8_t comOUTbufImpulse1[RXSIZEBUF];
 uint8_t comOUTbufImpulse3[RXSIZEBUF];
@@ -86,6 +104,25 @@ int main(void)
   TransmitCommand(commandBufOutRov,1);
   
   sysClkSpeed = HAL_RCC_GetSysClockFreq();
+  
+  rover.a = 193;
+  rover.b = 219;
+  rover.wheel_diameter = 96;
+  rover.pulse_per_cycle = 4 * 11 * 131;
+  rover.speed_to_mm = 5.375;
+  rover.velocity = 0;
+  rover.direction = 0;
+  //circonferenza 301 mm
+  // costante 5.375 
+  // 56 sec per 10 giri speed 1 -> 53.75 mm/s
+  // 28 sec per 10 giri speed 2 -> 107.5 mm/s
+  // 18 sec per 10 giri speed 3 -> 167 mm/s
+  // 14 sec per 10 giri speed 4 -> 215 mm/s
+  // 11.5 sec per 10 giri speed 5 -> 261.7 mm/s
+  // 9.5 sec per 10 giri speed 6 -> 316.8 mm/s
+  // 8.1 sec per 10 giri speed 7 -> 371.6 mm/s
+  // 8.1 sec per 10 giri speed 8
+  // 8.1 sec per 10 giri speed 9
 
   timeout=numBytesIN=numBytesOUT=numBytesTransmitted=0;
   impulseCountEngForw = impulseCountEngRight = 0;
@@ -108,23 +145,27 @@ int main(void)
 //      HAL_UART_Transmit_IT(&huart3,(uint8_t *)comOUTbufImpulse3,strlen(comOUTbufImpulse3));
 //      timePrintImpulse = 0;
 //    }
-    if(moveTick >= 100 && numBytesIN > 1){ // > 1 per il \n aggiunto su seriale
+    if(moveTick >= 100 && numBytesIN > 0){ // > 1 per il \n aggiunto su seriale
       if(comINbuf[strlen(comINbuf)-1] == '\n') comINbuf[strlen(comINbuf)-1] = '\0'; // strip del \n
       strcpy(comOUTbuf,comINbuf);
       strcpy(bufCheck,comINbuf);
-      errorCommandRover = checkCommandRov(bufCheck,&timeRov,&speedRov);  
+      errorCommandRover = checkCommandRov(bufCheck,&timeRov,&speedRov,&direction_rov,&angular_rate_rov);  
       HAL_UART_Transmit_IT(&huart3,(uint8_t *)comOUTbuf,strlen(comOUTbuf));
       //timer start timeRov
       if(!errorCommandRover){
-        TranslateCommand(comINbuf,commandBufOutRov,speedRov);
+        TranslateCommand(comINbuf,commandBufOutRov,speedRov,direction_rov,angular_rate_rov);
         TransmitCommand(commandBufOutRov,0);
       }
       moveTick = 0;
       numBytesIN = 0;
+      for(int i=0;i<10;i++)
+        comINbuf[i] = '\0';
+      
+      //strcpy(comINbuf,"");
     }
     
-    if(numBytesIN >= 4){
-      comINbuf[3]=0;
+    if(numBytesIN >= 10){  // > 10 per non entrare con i comandi del rover
+      //comINbuf[3]=0; //ha problemi con il buffer per la rotazione
       errorCommand = checkCommand(comINbuf);
       if(errorCommand == 0){
         sprintf(comOUTbuf,"\n%s OK\n",(char *)comINbuf);
@@ -139,19 +180,19 @@ int main(void)
       }
       numBytesIN = 0;
     }
-    else if (numBytesIN>0)
-    {   // numero caratteri insufficiente
-        if (timeout>10)
-        {
-            numBytesIN = 0;
-            strcpy(comINbuf,"");
-            timeout=0;
-        }
-    }
-    else
-    {   // niente su seriale
-      timeout=0;
-    }
+//    else if (numBytesIN>0)
+//    {   // numero caratteri insufficiente
+//        if (timeout>10)
+//        {
+//            numBytesIN = 0;
+//            strcpy(comINbuf,"");
+//            timeout=0;
+//        }
+//    }
+//    else
+//    {   // niente su seriale
+//      timeout=0;
+//    }
     if(speedArray[0] == 's' && ledState[0] == off){
         HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin,GPIO_PIN_SET);
         ledState[0] = on;
@@ -192,12 +233,14 @@ void Init_RovBuf(uint8_t comBufOutRov[][RXSIZEBUF]){
   comBufOutRov[3][1] = 0;
 }
 
-int checkCommandRov(char *str,int *time, int *speed){
+int checkCommandRov(char *str,int *time, int *speed,int *direction_rov, float *angular_rate_rov){
   
   //F->forward R->reverse L->left R->right X->stop G->go back Z -> rotate left C -> rotate right
   int error = 0;
-  char timeStr[10];
+  char tmpStr[10];
+  int value_angle = 0;
   char speedStr[10];
+  
   
   if(str[0] == 'X'){
     if(strlen(str) > 1){
@@ -217,7 +260,7 @@ int checkCommandRov(char *str,int *time, int *speed){
       return error; 
   }
   if(str[0] != 'F' && str[0] != 'R' && str[0] != 'L' && str[0] != 'B' && str[0] != 'X' 
-     && str[0] != 'Z' && str[0] != 'C' && str[0] != 'Y' && str[0] != 'J' && str[0] != 'U' && str[0] != 'H' && str[0] != 'N' && str[0] != 'M')  {
+     && str[0] != 'Z' && str[0] != 'C' && str[0] != 'Y' && str[0] != 'J' && str[0] != 'U' && str[0] != 'H' && str[0] != 'N' && str[0] != 'M' && str[0] != 'Q')  {
     error = 1;
     return error;
   }
@@ -227,22 +270,45 @@ int checkCommandRov(char *str,int *time, int *speed){
     error = 1;
     return error;
   }
-  //controllo parametro opzionale tempo
-  if(strlen(str) == 2){
-    *time = 9999;
-  }
-  else{
-    strncpy(timeStr,str+2,4);
-    timeStr[4] = '\0';
-    if(((*time) = atoi(timeStr)) == 0){
+  
+  //modifica da parametro tempo a direzione (0 - 360) gradi
+  //1 -> +30 gradi, 12 -> 360 gradi
+  if(str[0] == 'Q'){
+    if(strlen(str) < 6){
+      error = 1;
+      return error;
+    }
+    strncpy(tmpStr,str+2,2);
+    tmpStr[2] = '\0';
+    if(((value_angle) = atoi(tmpStr)) == 0){
+      error = 1;
+      return error;
+    }
+    *direction_rov = value_angle * 30;
+    
+    
+    strncpy(tmpStr,str+4,2);
+    tmpStr[2] = '\0';
+    if(((*angular_rate_rov) = atof(tmpStr)) == 0){
       error = 1;
       return error;
     }
   }
+//  if(strlen(str) == 2){
+//    *time = 9999;
+//  }
+//  else{
+//    strncpy(timeStr,str+2,4);
+//    timeStr[4] = '\0';
+//    if(((*time) = atoi(timeStr)) == 0){
+//      error = 1;
+//      return error;
+//    }
+//  }
   return error;
 }
 
-void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF],int speed){
+void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF],int speed, int direction_rov, float angular_rate_rov){
   //speed valori da 0 a 9 -> solo valori positivi della velocità 0-> 130 9->255
   
   //0 -> dx dietro, 1 -> dx avanti, 2 -> sx dietro, 3 -> sx avanti
@@ -352,8 +418,68 @@ void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF],int speed){
     comBufOutRov[3][1] = 0;
   }
   
+  //rotazione con velocità angolare
+  if(str[0] == 'Q'){
+    //convert angular_rate
+    angular_rate_rov /= 10;
+    setVelocity(realSpeed * rover.speed_to_mm,direction_rov,angular_rate_rov,0);
+  }
   
 }
+
+
+void setVelocity(int velocity, int direction, float angular_rate, int fake){
+  float rad_per_deg;
+  float vx,vy,vp,v1,v2,v3,v4;
+  float v_s[4];
+  
+  if(direction > 180){
+    velocity = -velocity;
+    angular_rate = -angular_rate;
+  }
+        
+   rad_per_deg = PI / 180;
+   vx = velocity * cos(direction * rad_per_deg);
+   vy = velocity * sin(direction * rad_per_deg);
+   vp = angular_rate * (rover.a/2 + rover.b/2);
+   
+   v1 = vy - vx + vp; //avanti dx
+   v2 = vy + vx - vp; //avanti sx
+   v3 = vy - vx - vp; //dietro sx
+   v4 = vy + vx + vp; //dietro dx
+   
+   //vedere la corrispondenza delle ruote  
+   v_s[0] = v4;
+   v_s[1] = -v1;
+   v_s[2] = -v3;
+   v_s[3] = v2;
+   
+   for(int i=0;i<4;i++){
+     speedConvert(&v_s[i]);
+   }
+   
+   if (fake)
+     return;
+
+   //rover.motor_controller.set_speed(v_s);
+   rover.velocity = velocity;
+   rover.direction = direction;
+   rover.angular_rate = angular_rate;
+   
+   commandBufOutRov[0][1] = v_s[0];
+   commandBufOutRov[1][1] = v_s[1];
+   commandBufOutRov[2][1] = v_s[2];
+   commandBufOutRov[3][1] = v_s[3];
+    
+   //a -> dist orizzontale
+   //b ->dist verticale
+}
+
+void speedConvert(float *speed){
+  (*speed) /= 5.375;
+  *speed = (int)(*speed);
+}
+  
 int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag){
       uint8_t bufOut[8];
       if(stopFlag) {
@@ -375,12 +501,14 @@ int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag){
         impulseResetFlag = 0;
       }
       
+      
+      ////////////da modificare 
       if(bufOut[1] > 90 && bufOut[3] > 90) roverDirection = left;
       else if(bufOut[1] > 0 && bufOut[3] > 90) roverDirection = forward;
       else if(bufOut[1] > 90 && bufOut[3] > 0) roverDirection = backwards;  
       else if(bufOut[1] > 0 && bufOut[3] > 0) roverDirection = right;
       else roverDirection = none;
-      
+      /////////////////////////
       
 //      //azzera conteggio impulsi quando si ferma il rover
 //      if(bufOut[1] == 0 && bufOut[2] == 0 && bufOut[3] == 0 && bufOut[4] == 0){
@@ -413,26 +541,26 @@ int checkCommand(char *str){
 void goBack(){
   checkRx = 1; // se si riceve un comando durante il goBack si interrompe il ritorno e si resettano gli impulsi
   if(impulseCountEngForw > 0){
-    TranslateCommand("B2",commandBufOutRov,2);
+    TranslateCommand("B2",commandBufOutRov,2,0,0);
     TransmitCommand(commandBufOutRov,0);
     while(impulseCountEngForw > 0 && !commandReceivedFlag);
     TransmitCommand(commandBufOutRov,1); //stop movement
   }
   else if(impulseCountEngForw < 0){
-    TranslateCommand("F2",commandBufOutRov,2);
+    TranslateCommand("F2",commandBufOutRov,2,0,0);
     TransmitCommand(commandBufOutRov,0);
     while(impulseCountEngForw < 0 && !commandReceivedFlag);
     TransmitCommand(commandBufOutRov,1); //stop movement
   }
   
   if(impulseCountEngRight > 0){
-    TranslateCommand("L2",commandBufOutRov,2);
+    TranslateCommand("L2",commandBufOutRov,2,0,0);
     TransmitCommand(commandBufOutRov,0);
     while(impulseCountEngRight > 0 && !commandReceivedFlag);
     TransmitCommand(commandBufOutRov,1); //stop movement
   }
   else if(impulseCountEngRight < 0){
-    TranslateCommand("R2",commandBufOutRov,2);
+    TranslateCommand("R2",commandBufOutRov,2,0,0);
     TransmitCommand(commandBufOutRov,0);
     while(impulseCountEngRight < 0 && !commandReceivedFlag);
     TransmitCommand(commandBufOutRov,1); //stop movement
@@ -468,6 +596,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
       
       if(numBytesIN < RXSIZEBUF){
         comINbuf[numBytesIN++] = tmp;
+        moveTick = 0;
       }
     }
 }
