@@ -294,7 +294,7 @@
                     <item>*speed</item>
                     <item>vy</item>
                     <item>angular_rate</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>

@@ -29,6 +29,10 @@ namespace roverControl
         private Boolean testRunning;
         private Boolean adjusting;
         private Boolean simulationStartFlag;
+        private int directionRov;
+        private float angularSpeedRov;
+        private char[] dirBuf;
+        private char[] angSpeedBuf;
         int countCs;
         public ROVER()
         {
@@ -48,6 +52,10 @@ namespace roverControl
             this.adjusting = false;
             this.simulationStartFlag = false;
             this.countCs = 0;
+            this.directionRov = 0;
+            this.angularSpeedRov = 0;
+            this.dirBuf = new char[2];
+            this.angSpeedBuf = new char[2];
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -174,6 +182,13 @@ namespace roverControl
                 this.pressedKeys.Add(e.KeyCode);
             }
 
+            if (e.KeyCode == Keys.F && this.pressedKeys.Count == 0)
+            {
+                comOutBuf = "Q" + this.roverSpeed + new String(this.dirBuf) + new String(this.angSpeedBuf);
+                //this.portBox.Text = comOutBuf;
+                this.pressedKeys.Add(e.KeyCode);
+            }
+
             if (e.KeyCode == Keys.R)
             {
                 if(this.roverSpeed < 9)
@@ -216,6 +231,12 @@ namespace roverControl
             {
                 comOutBuf = "X\n";
                 this.rotateRightButton.BackColor = Control.DefaultBackColor;
+                this.pressedKeys.Remove(e.KeyCode);
+            }
+
+            if (e.KeyCode == Keys.F)
+            {
+                comOutBuf = "X\n";
                 this.pressedKeys.Remove(e.KeyCode);
             }
 
@@ -343,6 +364,26 @@ namespace roverControl
                 }
                 this.simulationStartFlag = false;
             }
+        }
+
+        private void directionBox_TextChanged(object sender, EventArgs e)
+        {
+            int.TryParse(this.directionBox.Text.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out this.directionRov);
+            this.directionRov /= 30;
+
+            this.dirBuf[0] = (char)('0' + this.directionRov / 10);
+            this.dirBuf[1] = (char)('0' + this.directionRov % 10);
+        }
+
+        private void angularSpeedBox_TextChanged(object sender, EventArgs e)
+        {
+            int tmp;
+            float.TryParse(this.angularSpeedBox.Text.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out this.angularSpeedRov);
+
+            this.angularSpeedRov *= 10;
+            tmp = (int)this.angularSpeedRov;
+            this.angSpeedBuf[0] = (char)('0' + tmp / 10);
+            this.angSpeedBuf[1] = (char)('0' + tmp % 10);
         }
     }
 }

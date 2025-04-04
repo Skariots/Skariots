@@ -51,6 +51,10 @@
             this.startTestButton = new System.Windows.Forms.Button();
             this.stopTestButton = new System.Windows.Forms.Button();
             this.timerCS = new System.Windows.Forms.Timer(this.components);
+            this.directionBox = new System.Windows.Forms.TextBox();
+            this.angularSpeedBox = new System.Windows.Forms.TextBox();
+            this.directionLabel = new System.Windows.Forms.Label();
+            this.angularSpeedLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // serialPort
@@ -252,11 +256,53 @@
             this.timerCS.Interval = 10;
             this.timerCS.Tick += new System.EventHandler(this.timerCS_Tick);
             // 
+            // directionBox
+            // 
+            this.directionBox.Location = new System.Drawing.Point(306, 376);
+            this.directionBox.Name = "directionBox";
+            this.directionBox.Size = new System.Drawing.Size(100, 22);
+            this.directionBox.TabIndex = 17;
+            this.directionBox.Text = "0";
+            this.directionBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.directionBox.TextChanged += new System.EventHandler(this.directionBox_TextChanged);
+            // 
+            // angularSpeedBox
+            // 
+            this.angularSpeedBox.Location = new System.Drawing.Point(457, 375);
+            this.angularSpeedBox.Name = "angularSpeedBox";
+            this.angularSpeedBox.Size = new System.Drawing.Size(100, 22);
+            this.angularSpeedBox.TabIndex = 18;
+            this.angularSpeedBox.Text = "0.0";
+            this.angularSpeedBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.angularSpeedBox.TextChanged += new System.EventHandler(this.angularSpeedBox_TextChanged);
+            // 
+            // directionLabel
+            // 
+            this.directionLabel.AutoSize = true;
+            this.directionLabel.Location = new System.Drawing.Point(303, 400);
+            this.directionLabel.Name = "directionLabel";
+            this.directionLabel.Size = new System.Drawing.Size(107, 16);
+            this.directionLabel.TabIndex = 19;
+            this.directionLabel.Text = "degrees (0 - 360)";
+            // 
+            // angularSpeedLabel
+            // 
+            this.angularSpeedLabel.AutoSize = true;
+            this.angularSpeedLabel.Location = new System.Drawing.Point(519, 400);
+            this.angularSpeedLabel.Name = "angularSpeedLabel";
+            this.angularSpeedLabel.Size = new System.Drawing.Size(38, 16);
+            this.angularSpeedLabel.TabIndex = 20;
+            this.angularSpeedLabel.Text = "rad/s";
+            // 
             // ROVER
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(964, 570);
+            this.Controls.Add(this.angularSpeedLabel);
+            this.Controls.Add(this.directionLabel);
+            this.Controls.Add(this.angularSpeedBox);
+            this.Controls.Add(this.directionBox);
             this.Controls.Add(this.stopTestButton);
             this.Controls.Add(this.startTestButton);
             this.Controls.Add(this.rotateLeftButton);
@@ -310,6 +356,10 @@
         private System.Windows.Forms.Button startTestButton;
         private System.Windows.Forms.Button stopTestButton;
         private System.Windows.Forms.Timer timerCS;
+        private System.Windows.Forms.TextBox directionBox;
+        private System.Windows.Forms.TextBox angularSpeedBox;
+        private System.Windows.Forms.Label directionLabel;
+        private System.Windows.Forms.Label angularSpeedLabel;
     }
 }
 
