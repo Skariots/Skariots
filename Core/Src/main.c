@@ -15,7 +15,7 @@ void Init_RovBuf(uint8_t commandBufOutRov[4][RXSIZEBUF]);
 int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag);
 int checkCommandRov(char *str, int *time, int *speed,int *direction_rov, float *angular_rate_rov);
 void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF], int speed,int direction_rov, float angular_rate_rov);
-void setVelocity(int velocity, int direction, float angular_rate, int fake);
+void setVelocity(int velocity, int direction, float angular_rate, int backFlag);
 void speedConvert(float *v_s);
 int checkCommand(char *str);
 void goBack();
@@ -260,7 +260,7 @@ int checkCommandRov(char *str,int *time, int *speed,int *direction_rov, float *a
       return error; 
   }
   if(str[0] != 'F' && str[0] != 'R' && str[0] != 'L' && str[0] != 'B' && str[0] != 'X' 
-     && str[0] != 'Z' && str[0] != 'C' && str[0] != 'Y' && str[0] != 'J' && str[0] != 'U' && str[0] != 'H' && str[0] != 'N' && str[0] != 'M' && str[0] != 'Q')  {
+     && str[0] != 'Z' && str[0] != 'C' && str[0] != 'Y' && str[0] != 'J' && str[0] != 'U' && str[0] != 'H' && str[0] != 'N' && str[0] != 'M' && str[0] != 'Q' && str[0] != 'E')  {
     error = 1;
     return error;
   }
@@ -273,7 +273,7 @@ int checkCommandRov(char *str,int *time, int *speed,int *direction_rov, float *a
   
   //modifica da parametro tempo a direzione (0 - 360) gradi
   //1 -> +30 gradi, 12 -> 360 gradi
-  if(str[0] == 'Q'){
+  if(str[0] == 'Q' || str[0] == 'E'){
     if(strlen(str) < 6){
       error = 1;
       return error;
@@ -425,10 +425,16 @@ void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF],int speed, int
     setVelocity(realSpeed * rover.speed_to_mm,direction_rov,angular_rate_rov,0);
   }
   
+  if(str[0] == 'E'){
+    //convert angular_rate
+    angular_rate_rov /= 10;
+    setVelocity(realSpeed * rover.speed_to_mm,direction_rov,angular_rate_rov,1);
+  }
+  
 }
 
 
-void setVelocity(int velocity, int direction, float angular_rate, int fake){
+void setVelocity(int velocity, int direction, float angular_rate, int backFlag){
   float rad_per_deg;
   float vx,vy,vp,v1,v2,v3,v4;
   float v_s[4];
@@ -436,6 +442,10 @@ void setVelocity(int velocity, int direction, float angular_rate, int fake){
   if(direction > 180){
     velocity = -velocity;
     angular_rate = -angular_rate;
+  }
+  
+  if(backFlag){
+    velocity = -velocity;
   }
         
    rad_per_deg = PI / 180;
@@ -458,9 +468,6 @@ void setVelocity(int velocity, int direction, float angular_rate, int fake){
      speedConvert(&v_s[i]);
    }
    
-   if (fake)
-     return;
-
    //rover.motor_controller.set_speed(v_s);
    rover.velocity = velocity;
    rover.direction = direction;

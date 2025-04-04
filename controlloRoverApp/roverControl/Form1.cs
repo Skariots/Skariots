@@ -189,6 +189,13 @@ namespace roverControl
                 this.pressedKeys.Add(e.KeyCode);
             }
 
+            if (e.KeyCode == Keys.G && this.pressedKeys.Count == 0)
+            {
+                comOutBuf = "E" + this.roverSpeed + new String(this.dirBuf) + new String(this.angSpeedBuf);
+                //this.portBox.Text = comOutBuf;
+                this.pressedKeys.Add(e.KeyCode);
+            }
+
             if (e.KeyCode == Keys.R)
             {
                 if(this.roverSpeed < 9)
@@ -209,6 +216,14 @@ namespace roverControl
         }
         private void ROVER_KeyUp(object sender, KeyEventArgs e)
         {
+
+            if (e.KeyCode == Keys.Enter)
+            {
+                connectButton.Focus();
+                e.Handled = true;
+                e.SuppressKeyPress = true; 
+            }
+
             if (e.KeyCode == Keys.W || e.KeyCode == Keys.A || e.KeyCode == Keys.S || e.KeyCode == Keys.D)
             {
                 comOutBuf = "X\n";
@@ -234,7 +249,7 @@ namespace roverControl
                 this.pressedKeys.Remove(e.KeyCode);
             }
 
-            if (e.KeyCode == Keys.F)
+            if (e.KeyCode == Keys.F || e.KeyCode == Keys.G)
             {
                 comOutBuf = "X\n";
                 this.pressedKeys.Remove(e.KeyCode);
@@ -274,7 +289,9 @@ namespace roverControl
                 comInBufGyro.Append((char)tmpGyro[0]);
                 numBytesReceived++;
             }
-            */   
+            */
+
+
         }
 
         private void gyroTimer_Tick(object sender, EventArgs e)
@@ -307,7 +324,8 @@ namespace roverControl
             {
                 this.currentAngle -= 360;
             }
-            
+
+            this.currentAngle = (this.currentAngle + this.lastAngle) / 2; //media tra gli ultimi 2 valori del giroscopio
             this.lastAngle = this.currentAngle;
             this.orientationBox.Text = this.currentAngle.ToString("F2", CultureInfo.InvariantCulture);
         }
