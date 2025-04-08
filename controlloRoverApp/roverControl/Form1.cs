@@ -33,7 +33,13 @@ namespace roverControl
         private float angularSpeedRov;
         private char[] dirBuf;
         private char[] angSpeedBuf;
-        int countCs;
+        private int countCs;
+        private String comInBufSer;
+        private int impulseCountForward;
+        private int impulseCountRight;
+        private Boolean dontRead;
+        private enum Direction{forward = 1, right = 2 ,backwards = 3, left = 4, none = 0};
+        private Direction direction;
         public ROVER()
         {
             InitializeComponent();
@@ -56,11 +62,18 @@ namespace roverControl
             this.angularSpeedRov = 0;
             this.dirBuf = new char[2];
             this.angSpeedBuf = new char[2];
+            this.comInBufSer = null;
+            this.impulseCountForward = 0;
+            this.impulseCountRight = 0;
+            this.dontRead = false;
+            this.direction = Direction.none;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             int i = 0;
+            this.currentAngle = 0;
+            this.lastAngle = 0;
             if (serialPort.IsOpen)
             {
                 try
@@ -76,7 +89,7 @@ namespace roverControl
                 int.TryParse(portBox.Text, out this.numPort);
                 if (numPort == 0)
                 {
-                    for (i = 1; i < 10; i++)
+                    for (i = 1; i < 15; i++)
                     {
                         try
                         {
@@ -112,7 +125,7 @@ namespace roverControl
 
             if (!gyroPort.IsOpen)
             {
-                for(int j = i;j < 10; j++)
+                for(int j = i;j < 15; j++)
                 {
                     try
                     {
@@ -145,27 +158,32 @@ namespace roverControl
         }
         private void ROVER_KeyDown(object sender, KeyEventArgs e)
         {
+            this.stopTestButton_Click(null,null);
             if (e.KeyCode == Keys.W && this.pressedKeys.Count == 0)
             {
                 comOutBuf = "F" + this.roverSpeed;
+                this.direction = Direction.forward;
                 this.forwardButton.BackColor = Color.LightGray;
                 this.pressedKeys.Add(e.KeyCode);
             }
             if (e.KeyCode == Keys.A && this.pressedKeys.Count == 0)
             {
                 comOutBuf = "L" + this.roverSpeed;
+                this.direction = Direction.left;
                 this.leftButton.BackColor = Color.LightGray;
                 this.pressedKeys.Add(e.KeyCode);
             }
             if (e.KeyCode == Keys.S && this.pressedKeys.Count == 0)
             {
                 comOutBuf = "B" + this.roverSpeed;
+                this.direction = Direction.backwards;
                 this.backwardsButton.BackColor = Color.LightGray;
                 this.pressedKeys.Add(e.KeyCode);
             }
             if (e.KeyCode == Keys.D && this.pressedKeys.Count == 0)
             {
                 comOutBuf = "R" + this.roverSpeed;
+                this.direction = Direction.right;
                 this.rightButton.BackColor = Color.LightGray;
                 this.pressedKeys.Add(e.KeyCode);
             }
@@ -226,7 +244,7 @@ namespace roverControl
 
             if (e.KeyCode == Keys.W || e.KeyCode == Keys.A || e.KeyCode == Keys.S || e.KeyCode == Keys.D)
             {
-                comOutBuf = "X\n";
+                comOutBuf = "X";
                 this.forwardButton.BackColor = Control.DefaultBackColor;
                 this.rightButton.BackColor = Control.DefaultBackColor;
                 this.backwardsButton.BackColor = Control.DefaultBackColor;
@@ -237,27 +255,27 @@ namespace roverControl
             ////la funzione go back si bugga quando chiamata dopo una rotazione///////////////////////
             if (e.KeyCode == Keys.Q)
             {
-                comOutBuf = "X\n";
+                comOutBuf = "X";
                 this.rotateLeftButton.BackColor = Control.DefaultBackColor;
                 this.pressedKeys.Remove(e.KeyCode);
             }
 
             if (e.KeyCode == Keys.E)
             {
-                comOutBuf = "X\n";
+                comOutBuf = "X";
                 this.rotateRightButton.BackColor = Control.DefaultBackColor;
                 this.pressedKeys.Remove(e.KeyCode);
             }
 
             if (e.KeyCode == Keys.F || e.KeyCode == Keys.G)
             {
-                comOutBuf = "X\n";
+                comOutBuf = "X";
                 this.pressedKeys.Remove(e.KeyCode);
             }
 
             if (e.KeyCode == Keys.G)
             {
-                comOutBuf = "G\n";
+                comOutBuf = "G";
             }
 
             if (e.KeyCode == Keys.P)
@@ -269,11 +287,14 @@ namespace roverControl
         private void resetButton_Click(object sender, EventArgs e)
         {
             comOutBuf = "XR";
+            this.impulseCountForward = 0;
+            this.impulseCountRight = 0;
+            this.dontRead = true;
         }
 
         private void goBackButton_Click(object sender, EventArgs e)
         {
-            comOutBuf = "G\n";
+            comOutBuf = "G";
         }
 
         private void gyroPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
@@ -296,19 +317,6 @@ namespace roverControl
 
         private void gyroTimer_Tick(object sender, EventArgs e)
         {
-            /*
-            int currentIndexAngle = this.anglesReceived.Length;
-            if(currentIndexAngle >= 5)
-            {
-                for(int i = 0; i < 4; i++)
-                {
-                    this.anglesReceived[i] = this.anglesReceived[i + 1];
-                }
-                currentIndexAngle = 4;
-            }
-            
-            this.mediumAngle = anglesReceived.Average();
-            */
             if (float.TryParse(comInBufGyro, NumberStyles.Float, CultureInfo.InvariantCulture, out float angle))
             {
                 this.currentAngle = angle;
@@ -328,6 +336,8 @@ namespace roverControl
             this.currentAngle = (this.currentAngle + this.lastAngle) / 2; //media tra gli ultimi 2 valori del giroscopio
             this.lastAngle = this.currentAngle;
             this.orientationBox.Text = this.currentAngle.ToString("F2", CultureInfo.InvariantCulture);
+            this.impForwTextBox.Text = this.impulseCountForward.ToString();
+            this.impRigTextBox.Text = this.impulseCountRight.ToString();
         }
 
         private void startTestButton_Click(object sender, EventArgs e)
@@ -350,25 +360,26 @@ namespace roverControl
 
         private void timerCS_Tick(object sender, EventArgs e)
         {
+            
             if (testRunning)
-            {
+            {                
                 if(adjusting)
                 {
                     this.countCs++;
                 }
-                if(this.countCs >= 50 || this.countCs == 0)
+                if(this.countCs >= 10 || this.countCs == 0)
                 {
                     if (this.currentAngle - startTargetAngle > 10.0)
                     {
                         this.adjusting = true;
                         this.countCs = 0;
-                        comOutBuf = "N" + this.roverSpeed.ToString();
+                        comOutBuf = "Q" + this.roverSpeed.ToString() + "03" + "02";
                     }
                     else if (this.currentAngle - startTargetAngle < -10.0)
                     {
                         this.adjusting = true;
                         this.countCs = 0;
-                        comOutBuf = "M" + this.roverSpeed.ToString();
+                        comOutBuf = "Q" + this.roverSpeed.ToString() + "09" + "02";
                     }
                     else if (this.currentAngle - startTargetAngle < 10.0 && this.currentAngle - startTargetAngle > -10.0 && (adjusting || this.simulationStartFlag)) //flag adjusting per non intasare il buffer
                     {
@@ -381,7 +392,56 @@ namespace roverControl
                     }
                 }
                 this.simulationStartFlag = false;
+                /*
+                if (adjusting)
+                {
+                    this.countCs++;
+                }
+                if(this.countCs > 10)
+                {
+                    if (this.timeToRotateLeft > 0)
+                    {
+                        comOutBuf = "Q" + this.roverSpeed.ToString() + "03" + "04"; ////overflow buffer
+                        this.timeToRotateLeft--;
+                    }
+
+                    if (this.timeToRotateRight > 0)
+                    {
+                        comOutBuf = "Q" + this.roverSpeed.ToString() + "09" + "04"; // overflow buffer
+                        this.timeToRotateRight--;
+                    }
+                }
+                if (this.countCs >= 50 || this.countCs == 0)
+                {
+                    if (this.currentAngle - startTargetAngle > 10.0 && !adjusting)
+                    {
+                        this.adjusting = true;
+                        this.countCs = 0;
+                        this.angleToRotate = Math.Abs(this.currentAngle - startTargetAngle);
+                        this.timeToRotateLeft = (int)(angleToRotate / (float)2.4); // tempo in decimi di secondo                        
+                    }
+                    else if (this.currentAngle - startTargetAngle < -10.0 && !adjusting)
+                    {
+                        this.adjusting = true;
+                        this.countCs = 0;
+                        this.angleToRotate = Math.Abs(this.currentAngle - startTargetAngle);
+                        this.timeToRotateRight = (int)(angleToRotate / (float)2.4); // tempo in decimi di secondo
+                        
+                    }
+                    else if (this.currentAngle - startTargetAngle < 10.0 && this.currentAngle - startTargetAngle > -10.0 && (adjusting || this.simulationStartFlag)) //flag adjusting per non intasare il buffer
+                    {
+                        comOutBuf = "F" + this.roverSpeed.ToString();
+                        //this.testRunning = false;
+                        //this.timerCS.Enabled = false;
+                        this.countCs = 0;
+                        this.adjusting = false;
+                        //this.comOutBuf = "X\n";
+                    }
+                }
+                this.simulationStartFlag = false;
+                */
             }
+                
         }
 
         private void directionBox_TextChanged(object sender, EventArgs e)
@@ -402,6 +462,40 @@ namespace roverControl
             tmp = (int)this.angularSpeedRov;
             this.angSpeedBuf[0] = (char)('0' + tmp / 10);
             this.angSpeedBuf[1] = (char)('0' + tmp % 10);
+        }
+
+        private void serialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        {
+            char type = '\0';
+
+            try
+            {
+                this.comInBufSer = this.serialPort.ReadLine();
+                type = this.comInBufSer[0];
+                this.comInBufSer = this.comInBufSer.Substring(1);
+
+            }
+            catch { };
+            if (type == 'c' || type == '\0') return;
+            
+            if(type == 'r')
+            {
+                if (this.dontRead)
+                {
+                    this.dontRead = false;
+                    return;
+                }
+                int.TryParse(comInBufSer, NumberStyles.Integer, CultureInfo.InvariantCulture, out this.impulseCountRight);
+            }
+
+            if (type == 'f')
+            {
+                if (this.dontRead)
+                {
+                    return;
+                }
+                int.TryParse(comInBufSer, NumberStyles.Integer, CultureInfo.InvariantCulture, out this.impulseCountForward);
+            }
         }
     }
 }

@@ -147,7 +147,8 @@ int main(void)
 //    }
     if(moveTick >= 100 && numBytesIN > 0){ // > 1 per il \n aggiunto su seriale
       if(comINbuf[strlen(comINbuf)-1] == '\n') comINbuf[strlen(comINbuf)-1] = '\0'; // strip del \n
-      strcpy(comOUTbuf,comINbuf);
+      //strcpy(comOUTbuf,comINbuf);
+      sprintf(comOUTbuf,"c%s\nf%d\nr%d\n",comINbuf,impulseCountEngForw,impulseCountEngRight);
       strcpy(bufCheck,comINbuf);
       errorCommandRover = checkCommandRov(bufCheck,&timeRov,&speedRov,&direction_rov,&angular_rate_rov);  
       HAL_UART_Transmit_IT(&huart3,(uint8_t *)comOUTbuf,strlen(comOUTbuf));
@@ -468,7 +469,6 @@ void setVelocity(int velocity, int direction, float angular_rate, int backFlag){
      speedConvert(&v_s[i]);
    }
    
-   //rover.motor_controller.set_speed(v_s);
    rover.velocity = velocity;
    rover.direction = direction;
    rover.angular_rate = angular_rate;
@@ -516,11 +516,6 @@ int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag){
       else if(bufOut[1] > 0 && bufOut[3] > 0) roverDirection = right;
       else roverDirection = none;
       /////////////////////////
-      
-//      //azzera conteggio impulsi quando si ferma il rover
-//      if(bufOut[1] == 0 && bufOut[2] == 0 && bufOut[3] == 0 && bufOut[4] == 0){
-//        impulseCountEngForw = 0;
-//      }
       
 }
 int checkCommand(char *str){

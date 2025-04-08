@@ -55,11 +55,16 @@
             this.angularSpeedBox = new System.Windows.Forms.TextBox();
             this.directionLabel = new System.Windows.Forms.Label();
             this.angularSpeedLabel = new System.Windows.Forms.Label();
+            this.impRigTextBox = new System.Windows.Forms.TextBox();
+            this.impForwTextBox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // serialPort
             // 
             this.serialPort.BaudRate = 115200;
+            this.serialPort.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort_DataReceived);
             // 
             // portBox
             // 
@@ -84,6 +89,7 @@
             // 
             // commandTimer
             // 
+            this.commandTimer.Interval = 50;
             this.commandTimer.Tick += new System.EventHandler(this.commandTimer_Tick);
             // 
             // forwardButton
@@ -294,11 +300,51 @@
             this.angularSpeedLabel.TabIndex = 20;
             this.angularSpeedLabel.Text = "rad/s";
             // 
+            // impRigTextBox
+            // 
+            this.impRigTextBox.Location = new System.Drawing.Point(852, 224);
+            this.impRigTextBox.Name = "impRigTextBox";
+            this.impRigTextBox.Size = new System.Drawing.Size(100, 22);
+            this.impRigTextBox.TabIndex = 21;
+            this.impRigTextBox.Text = "0";
+            this.impRigTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // impForwTextBox
+            // 
+            this.impForwTextBox.Location = new System.Drawing.Point(852, 174);
+            this.impForwTextBox.Name = "impForwTextBox";
+            this.impForwTextBox.Size = new System.Drawing.Size(100, 22);
+            this.impForwTextBox.TabIndex = 22;
+            this.impForwTextBox.Text = "0";
+            this.impForwTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(790, 180);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(56, 16);
+            this.label1.TabIndex = 23;
+            this.label1.Text = "Forward";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(814, 227);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(32, 16);
+            this.label2.TabIndex = 24;
+            this.label2.Text = "right";
+            // 
             // ROVER
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(964, 570);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.impForwTextBox);
+            this.Controls.Add(this.impRigTextBox);
             this.Controls.Add(this.angularSpeedLabel);
             this.Controls.Add(this.directionLabel);
             this.Controls.Add(this.angularSpeedBox);
@@ -360,6 +406,10 @@
         private System.Windows.Forms.TextBox angularSpeedBox;
         private System.Windows.Forms.Label directionLabel;
         private System.Windows.Forms.Label angularSpeedLabel;
+        private System.Windows.Forms.TextBox impRigTextBox;
+        private System.Windows.Forms.TextBox impForwTextBox;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
     }
 }
 
