@@ -33,11 +33,16 @@ namespace roverControl
         private float angularSpeedRov;
         private char[] dirBuf;
         private char[] angSpeedBuf;
-        private int countCs;
+        
         private String comInBufSer;
         private int impulseCountForward;
         private int impulseCountRight;
         private Boolean dontRead;
+
+        private int countCs;
+        private int timeRotateRight;
+        private int timeRotateLeft;
+        private double angleRotate;
         private enum Direction{forward = 1, right = 2 ,backwards = 3, left = 4, none = 0};
         private Direction direction;
         public ROVER()
@@ -48,13 +53,13 @@ namespace roverControl
             this.comOutBuf = null;
             this.comInBufGyro = null;
             this.tmpGyro = new byte[1];
-            this.roverSpeed = 1;
+            this.roverSpeed = 3;
             this.pressedKeys = new HashSet<Keys>();
             this.anglesReceived = new float[5];
             this.currentAngle = 0;
             this.lastAngle = 0;
             this.startTargetAngle = 0;
-            this.testRunning = false;
+            this.testRunning = false; ////////////////////////////////////////////
             this.adjusting = false;
             this.simulationStartFlag = false;
             this.countCs = 0;
@@ -67,6 +72,9 @@ namespace roverControl
             this.impulseCountRight = 0;
             this.dontRead = false;
             this.direction = Direction.none;
+            this.timeRotateLeft = 0;
+            this.timeRotateRight = 0;
+            this.angleRotate = 0;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -148,6 +156,7 @@ namespace roverControl
         private void Form1_Load(object sender, EventArgs e)
         {
             this.ActiveControl = connectButton;
+            this.speedBox.Text = this.roverSpeed.ToString();
         }
 
         private void commandTimer_Tick(object sender, EventArgs e)
@@ -159,6 +168,18 @@ namespace roverControl
         private void ROVER_KeyDown(object sender, KeyEventArgs e)
         {
             this.stopTestButton_Click(null,null);
+            
+            if ((e.KeyCode == Keys.W || e.KeyCode == Keys.A || e.KeyCode == Keys.S || e.KeyCode == Keys.D) && this.direction == Direction.none)
+            {
+                this.startTargetAngle = this.currentAngle;
+                this.timerCS.Enabled = true;
+                this.testRunning = true;
+                this.timeRotateLeft = 0;
+                this.timeRotateRight = 0;
+
+                this.KeyDown -= ROVER_KeyDown;
+            }
+            
             if (e.KeyCode == Keys.W && this.pressedKeys.Count == 0)
             {
                 comOutBuf = "F" + this.roverSpeed;
@@ -234,7 +255,6 @@ namespace roverControl
         }
         private void ROVER_KeyUp(object sender, KeyEventArgs e)
         {
-
             if (e.KeyCode == Keys.Enter)
             {
                 connectButton.Focus();
@@ -250,6 +270,9 @@ namespace roverControl
                 this.backwardsButton.BackColor = Control.DefaultBackColor;
                 this.leftButton.BackColor = Control.DefaultBackColor;
                 this.pressedKeys.Remove(e.KeyCode);
+                this.direction = Direction.none;
+
+                this.KeyDown += ROVER_KeyDown;
             }
 
             ////la funzione go back si bugga quando chiamata dopo una rotazione///////////////////////
@@ -346,7 +369,7 @@ namespace roverControl
             this.timerCS.Enabled = true;
             this.countCs = 0;
             this.adjusting = false;
-            this.simulationStartFlag = true;
+            //this.simulationStartFlag = true;
             //this.startTargetAngle = 0; 
         }
 
@@ -360,90 +383,87 @@ namespace roverControl
 
         private void timerCS_Tick(object sender, EventArgs e)
         {
-            
             if (testRunning)
-            {                
-                if(adjusting)
+            {
+                if (this.currentAngle - this.startTargetAngle > 3.0)
                 {
-                    this.countCs++;
+                    if(direction == Direction.forward)
+                        comOutBuf = "N" + this.roverSpeed.ToString();
                 }
-                if(this.countCs >= 10 || this.countCs == 0)
+                else if (this.currentAngle - this.startTargetAngle < -3.0)
                 {
-                    if (this.currentAngle - startTargetAngle > 10.0)
-                    {
-                        this.adjusting = true;
-                        this.countCs = 0;
-                        comOutBuf = "Q" + this.roverSpeed.ToString() + "03" + "02";
-                    }
-                    else if (this.currentAngle - startTargetAngle < -10.0)
-                    {
-                        this.adjusting = true;
-                        this.countCs = 0;
-                        comOutBuf = "Q" + this.roverSpeed.ToString() + "09" + "02";
-                    }
-                    else if (this.currentAngle - startTargetAngle < 10.0 && this.currentAngle - startTargetAngle > -10.0 && (adjusting || this.simulationStartFlag)) //flag adjusting per non intasare il buffer
-                    {
+                    if (direction == Direction.forward)
+                        comOutBuf = "M" + this.roverSpeed.ToString();
+                }
+                else
+                {
+                    if (direction == Direction.forward)
                         comOutBuf = "F" + this.roverSpeed.ToString();
-                        //this.testRunning = false;
-                        //this.timerCS.Enabled = false;
-                        this.countCs = 0;
-                        this.adjusting = false;
-                        //this.comOutBuf = "X\n";
-                    }
                 }
-                this.simulationStartFlag = false;
-                /*
-                if (adjusting)
-                {
-                    this.countCs++;
-                }
-                if(this.countCs > 10)
-                {
-                    if (this.timeToRotateLeft > 0)
-                    {
-                        comOutBuf = "Q" + this.roverSpeed.ToString() + "03" + "04"; ////overflow buffer
-                        this.timeToRotateLeft--;
-                    }
-
-                    if (this.timeToRotateRight > 0)
-                    {
-                        comOutBuf = "Q" + this.roverSpeed.ToString() + "09" + "04"; // overflow buffer
-                        this.timeToRotateRight--;
-                    }
-                }
-                if (this.countCs >= 50 || this.countCs == 0)
-                {
-                    if (this.currentAngle - startTargetAngle > 10.0 && !adjusting)
-                    {
-                        this.adjusting = true;
-                        this.countCs = 0;
-                        this.angleToRotate = Math.Abs(this.currentAngle - startTargetAngle);
-                        this.timeToRotateLeft = (int)(angleToRotate / (float)2.4); // tempo in decimi di secondo                        
-                    }
-                    else if (this.currentAngle - startTargetAngle < -10.0 && !adjusting)
-                    {
-                        this.adjusting = true;
-                        this.countCs = 0;
-                        this.angleToRotate = Math.Abs(this.currentAngle - startTargetAngle);
-                        this.timeToRotateRight = (int)(angleToRotate / (float)2.4); // tempo in decimi di secondo
-                        
-                    }
-                    else if (this.currentAngle - startTargetAngle < 10.0 && this.currentAngle - startTargetAngle > -10.0 && (adjusting || this.simulationStartFlag)) //flag adjusting per non intasare il buffer
-                    {
-                        comOutBuf = "F" + this.roverSpeed.ToString();
-                        //this.testRunning = false;
-                        //this.timerCS.Enabled = false;
-                        this.countCs = 0;
-                        this.adjusting = false;
-                        //this.comOutBuf = "X\n";
-                    }
-                }
-                this.simulationStartFlag = false;
-                */
             }
-                
         }
 
+        /*
+        if (adjusting)
+        {
+            this.countCs++;
+        }
+        if(this.countCs >= 10)
+        {
+            if (this.timeRotateLeft > 0)
+            {
+               if(this.direction == Direction.forward)
+                    comOutBuf = "Q" + this.roverSpeed.ToString() + "03" + "04"; ////overflow buffer
+               else if(this.direction == Direction.backwards)
+                    comOutBuf = "E" + this.roverSpeed.ToString() + "03" + "04"; ////overflow buffer
+               this.timeRotateLeft--;
+            }
+
+            if (this.timeRotateRight > 0)
+            {
+                if (this.direction == Direction.forward)
+                   comOutBuf = "Q" + this.roverSpeed.ToString() + "09" + "04"; // overflow buffer
+                else if (this.direction == Direction.backwards)
+                    comOutBuf = "E" + this.roverSpeed.ToString() + "09" + "04"; // overflow buffer
+                this.timeRotateRight--;
+            }
+            this.countCs = 0;
+        }
+        if (this.timeRotateLeft == 0 && this.timeRotateRight == 0)
+        {
+            if (this.currentAngle - startTargetAngle > 10.0)
+            {
+                this.adjusting = true;
+                this.countCs = 0;
+                this.angleRotate = Math.Abs(this.currentAngle - startTargetAngle);
+                this.timeRotateLeft = (int)(angleRotate / (float)2.3); // tempo in decimi di secondo                        
+            }
+            else if (this.currentAngle - startTargetAngle < -10.0)
+            {
+                this.adjusting = true;
+                this.countCs = 0;
+                this.angleRotate = Math.Abs(this.currentAngle - startTargetAngle);
+                this.timeRotateRight = (int)(angleRotate / (float)2.3); // tempo in decimi di secondo
+
+            }
+            else if (this.currentAngle - startTargetAngle < 10.0 && this.currentAngle - startTargetAngle > -10.0 && adjusting) //flag adjusting per non intasare il buffer
+            {
+                if(this.direction == Direction.forward) comOutBuf = "F" + this.roverSpeed.ToString();
+                else if(this.direction == Direction.right) comOutBuf = "R" + this.roverSpeed.ToString();
+                else if (this.direction == Direction.backwards) comOutBuf = "B" + this.roverSpeed.ToString();
+                else if (this.direction == Direction.left) comOutBuf = "L" + this.roverSpeed.ToString();
+                else comOutBuf = "X" + this.roverSpeed.ToString();
+                //this.testRunning = false;
+                //this.timerCS.Enabled = false;
+                this.countCs = 0;
+                this.adjusting = false;
+                //this.comOutBuf = "X\n";
+            }
+        }
+        
+    }         
+        }
+    */
         private void directionBox_TextChanged(object sender, EventArgs e)
         {
             int.TryParse(this.directionBox.Text.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out this.directionRov);

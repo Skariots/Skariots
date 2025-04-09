@@ -265,10 +265,18 @@ int checkCommandRov(char *str,int *time, int *speed,int *direction_rov, float *a
     error = 1;
     return error;
   }
+  
   strncpy(speedStr,str+1,1);
   speedStr[1] = '\0';
   if(((*speed) = atoi(speedStr)) == 0){
     error = 1;
+    return error;
+  }
+  
+  if(str[0] == 'M' || str[0] == 'N'){
+    if(strlen(str) < 3 || (str[2] != 'F' && str[2] != 'R' && str[2] != 'B' && str[2] != 'L')){
+      error = 1;
+    }
     return error;
   }
   
@@ -398,18 +406,72 @@ void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF],int speed, int
   
   //stabilizza direzione verso sinistra
   if(str[0] == 'N'){
-    comBufOutRov[0][1] = realSpeed + (OFFSET_TO_SPEED * realSpeed);
-    comBufOutRov[1][1] = (-1 * realSpeed) - (OFFSET_TO_SPEED * realSpeed);
-    comBufOutRov[2][1] = -1 * realSpeed;
-    comBufOutRov[3][1] = realSpeed;
+    switch(str[2]){
+      case 'F' : {
+        comBufOutRov[0][1] = realSpeed + (OFFSET_TO_SPEED * realSpeed);
+        comBufOutRov[1][1] = (-1 * realSpeed) - (OFFSET_TO_SPEED * realSpeed);
+        comBufOutRov[2][1] = -1 * realSpeed;
+        comBufOutRov[3][1] = realSpeed;
+        break;
+      }
+      case 'R' : {
+        comBufOutRov[0][1] = realSpeed;
+        comBufOutRov[1][1] = realSpeed - (OFFSET_TO_SPEED * realSpeed);
+        comBufOutRov[2][1] = realSpeed;
+        comBufOutRov[3][1] = realSpeed - (OFFSET_TO_SPEED * realSpeed);
+        break;
+      }
+      case 'B' : {
+        comBufOutRov[0][1] = -1 * realSpeed;
+        comBufOutRov[1][1] = realSpeed;
+        comBufOutRov[2][1] = realSpeed + (OFFSET_TO_SPEED * realSpeed);
+        comBufOutRov[3][1] = -1 * realSpeed - (OFFSET_TO_SPEED * realSpeed);
+        break;
+      }
+      case 'L' : {
+        comBufOutRov[0][1] = -1 * realSpeed;
+        comBufOutRov[1][1] = -1 * realSpeed - (OFFSET_TO_SPEED * realSpeed);
+        comBufOutRov[2][1] = -1 * realSpeed;
+        comBufOutRov[3][1] = -1 * realSpeed - (OFFSET_TO_SPEED * realSpeed);
+        break;
+      }
+    default : break;
+    }
   }
   
   //stabilizza direzione verso destra
   if(str[0] == 'M'){
-    comBufOutRov[0][1] = realSpeed;
-    comBufOutRov[1][1] = -1 * realSpeed;
-    comBufOutRov[2][1] = (-1 * realSpeed) - (OFFSET_TO_SPEED * realSpeed);
-    comBufOutRov[3][1] = realSpeed + (OFFSET_TO_SPEED * realSpeed);
+    switch(str[2]){
+      case 'F' : {
+        comBufOutRov[0][1] = realSpeed;
+        comBufOutRov[1][1] = -1 * realSpeed;
+        comBufOutRov[2][1] = (-1 * realSpeed) - (OFFSET_TO_SPEED * realSpeed);
+        comBufOutRov[3][1] = realSpeed + (OFFSET_TO_SPEED * realSpeed);
+        break;
+      }
+      case 'R' : {
+        comBufOutRov[0][1] = realSpeed - (OFFSET_TO_SPEED * realSpeed);
+        comBufOutRov[1][1] = realSpeed;
+        comBufOutRov[2][1] = realSpeed - (OFFSET_TO_SPEED * realSpeed);
+        comBufOutRov[3][1] = realSpeed;
+        break;
+      }
+      case 'B' : {
+        comBufOutRov[0][1] = -1 * realSpeed - (OFFSET_TO_SPEED * realSpeed);
+        comBufOutRov[1][1] = realSpeed + (OFFSET_TO_SPEED * realSpeed);
+        comBufOutRov[2][1] = realSpeed;
+        comBufOutRov[3][1] = -1 * realSpeed ;
+        break;
+      }
+      case 'L' : {
+        comBufOutRov[0][1] = -1 * realSpeed - (OFFSET_TO_SPEED * realSpeed);
+        comBufOutRov[1][1] = -1 * realSpeed;
+        comBufOutRov[2][1] = -1 * realSpeed - (OFFSET_TO_SPEED * realSpeed);
+        comBufOutRov[3][1] = -1 * realSpeed;
+        break;
+      }
+    default : break;
+    }
   }
   
   if(str[0] == 'X'){
@@ -488,7 +550,7 @@ void speedConvert(float *speed){
 }
   
 int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag){
-      uint8_t bufOut[8];
+      uint8_t bufOut[5];
       if(stopFlag) {
         Init_RovBuf(commandBufOutRov);
       }
@@ -500,7 +562,7 @@ int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag){
       bufOut[4] = commandBufOutRov[3][1];
       
       
-      HAL_I2C_Master_Transmit_IT(&hi2c1,0x34 << 1,bufOut,sizeof(uint8_t) * 8); 
+      HAL_I2C_Master_Transmit_IT(&hi2c1,0x34 << 1,bufOut,sizeof(uint8_t) * 5); 
       
       if(impulseResetFlag) {
         impulseCountEngForw = 0;
@@ -542,31 +604,37 @@ int checkCommand(char *str){
 
 void goBack(){
   checkRx = 1; // se si riceve un comando durante il goBack si interrompe il ritorno e si resettano gli impulsi
-  if(impulseCountEngForw > 0){
-    TranslateCommand("B2",commandBufOutRov,2,0,0);
-    TransmitCommand(commandBufOutRov,0);
-    while(impulseCountEngForw > 0 && !commandReceivedFlag);
-    TransmitCommand(commandBufOutRov,1); //stop movement
-  }
-  else if(impulseCountEngForw < 0){
-    TranslateCommand("F2",commandBufOutRov,2,0,0);
-    TransmitCommand(commandBufOutRov,0);
-    while(impulseCountEngForw < 0 && !commandReceivedFlag);
-    TransmitCommand(commandBufOutRov,1); //stop movement
-  }
-  
+  char buf[8];
   if(impulseCountEngRight > 0){
-    TranslateCommand("L2",commandBufOutRov,2,0,0);
+    sprintf(buf,"L%d",speedRov);
+    TranslateCommand(buf,commandBufOutRov,speedRov,0,0);
     TransmitCommand(commandBufOutRov,0);
     while(impulseCountEngRight > 0 && !commandReceivedFlag);
-    TransmitCommand(commandBufOutRov,1); //stop movement
+    //TransmitCommand(commandBufOutRov,1); //ridondante, gia viene trasmesso dal main
   }
   else if(impulseCountEngRight < 0){
-    TranslateCommand("R2",commandBufOutRov,2,0,0);
+    sprintf(buf,"R%d",speedRov);
+    TranslateCommand(buf,commandBufOutRov,speedRov,0,0);
     TransmitCommand(commandBufOutRov,0);
     while(impulseCountEngRight < 0 && !commandReceivedFlag);
-    TransmitCommand(commandBufOutRov,1); //stop movement
+    //TransmitCommand(commandBufOutRov,1); //ridondante, gia viene trasmesso dal main
   }
+  HAL_Delay(500); //prova per efficienza
+  if(impulseCountEngForw > 0){
+    sprintf(buf,"B%d",speedRov);
+    TranslateCommand(buf,commandBufOutRov,speedRov,0,0);
+    TransmitCommand(commandBufOutRov,0);
+    while(impulseCountEngForw > 0 && !commandReceivedFlag);
+    //TransmitCommand(commandBufOutRov,1); //ridondante, gia viene trasmesso dal main
+  }
+  else if(impulseCountEngForw < 0){
+    sprintf(buf,"F%d",speedRov);
+    TranslateCommand(buf,commandBufOutRov,speedRov,0,0);
+    TransmitCommand(commandBufOutRov,0);
+    while(impulseCountEngForw < 0 && !commandReceivedFlag);
+    //TransmitCommand(commandBufOutRov,1); //ridondante, gia viene trasmesso dal main
+  }
+  
   // azzeramento impulsi nelle due direzioni
   impulseCountEngForw = 0;
   impulseCountEngRight = 0;

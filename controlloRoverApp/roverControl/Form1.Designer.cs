@@ -259,7 +259,6 @@
             // 
             // timerCS
             // 
-            this.timerCS.Interval = 10;
             this.timerCS.Tick += new System.EventHandler(this.timerCS_Tick);
             // 
             // directionBox
