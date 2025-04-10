@@ -387,18 +387,42 @@ namespace roverControl
             {
                 if (this.currentAngle - this.startTargetAngle > 3.0)
                 {
-                    if(direction == Direction.forward)
-                        comOutBuf = "N" + this.roverSpeed.ToString();
+                    if(this.direction == Direction.forward)
+                        comOutBuf = "N" + this.roverSpeed.ToString() + "F";
+                    else if(this.direction == Direction.right)
+                        comOutBuf = "N" + this.roverSpeed.ToString() + "R";
+                    else if (this.direction == Direction.backwards)
+                        comOutBuf = "N" + this.roverSpeed.ToString() + "B";
+                    else if (this.direction == Direction.left)
+                        comOutBuf = "N" + this.roverSpeed.ToString() + "L";
+
+                    this.adjusting = true;
                 }
                 else if (this.currentAngle - this.startTargetAngle < -3.0)
                 {
                     if (direction == Direction.forward)
-                        comOutBuf = "M" + this.roverSpeed.ToString();
+                        comOutBuf = "M" + this.roverSpeed.ToString() + "F";
+                    else if (direction == Direction.right)
+                        comOutBuf = "M" + this.roverSpeed.ToString() + "R";
+                    else if (direction == Direction.backwards)
+                        comOutBuf = "M" + this.roverSpeed.ToString() + "B";
+                    else if (direction == Direction.left)
+                        comOutBuf = "M" + this.roverSpeed.ToString() + "L";
+
+                    this.adjusting = true;
                 }
-                else
+                else if(this.adjusting)
                 {
                     if (direction == Direction.forward)
                         comOutBuf = "F" + this.roverSpeed.ToString();
+                    if (direction == Direction.right)
+                        comOutBuf = "R" + this.roverSpeed.ToString();
+                    if (direction == Direction.backwards)
+                        comOutBuf = "B" + this.roverSpeed.ToString();
+                    if (direction == Direction.left)
+                        comOutBuf = "L" + this.roverSpeed.ToString();
+
+                    this.adjusting = false;
                 }
             }
         }

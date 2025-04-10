@@ -295,7 +295,7 @@
                     <item>vy</item>
                     <item>angular_rate</item>
                     <item>realSpeed</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>
