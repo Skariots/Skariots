@@ -13,7 +13,7 @@
         <MemConfigValue>C:\Program Files\IAR Systems\Embedded Workbench 9.0\arm\CONFIG\debugger\ST\STM32H743ZI.ddf</MemConfigValue>
     </PlDriver>
     <DebugChecksum>
-        <Checksum>822276414</Checksum>
+        <Checksum>3758652986</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>

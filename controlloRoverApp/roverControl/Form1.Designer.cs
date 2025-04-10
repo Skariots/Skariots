@@ -185,7 +185,7 @@
             this.resetButton.Name = "resetButton";
             this.resetButton.Size = new System.Drawing.Size(100, 33);
             this.resetButton.TabIndex = 10;
-            this.resetButton.Text = "RESET POS";
+            this.resetButton.Text = "CALIBRATE";
             this.resetButton.UseVisualStyleBackColor = true;
             this.resetButton.Click += new System.EventHandler(this.resetButton_Click);
             // 
@@ -259,6 +259,7 @@
             // 
             // timerCS
             // 
+            this.timerCS.Enabled = true;
             this.timerCS.Tick += new System.EventHandler(this.timerCS_Tick);
             // 
             // directionBox
@@ -301,6 +302,7 @@
             // 
             // impRigTextBox
             // 
+            this.impRigTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.impRigTextBox.Location = new System.Drawing.Point(852, 224);
             this.impRigTextBox.Name = "impRigTextBox";
             this.impRigTextBox.Size = new System.Drawing.Size(100, 22);
@@ -310,6 +312,7 @@
             // 
             // impForwTextBox
             // 
+            this.impForwTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.impForwTextBox.Location = new System.Drawing.Point(852, 174);
             this.impForwTextBox.Name = "impForwTextBox";
             this.impForwTextBox.Size = new System.Drawing.Size(100, 22);
@@ -319,6 +322,7 @@
             // 
             // label1
             // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(790, 180);
             this.label1.Name = "label1";
@@ -328,6 +332,7 @@
             // 
             // label2
             // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(814, 227);
             this.label2.Name = "label2";

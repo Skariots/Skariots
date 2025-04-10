@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -45,6 +46,19 @@ namespace roverControl
         private double angleRotate;
         private enum Direction{forward = 1, right = 2 ,backwards = 3, left = 4, none = 0};
         private Direction direction;
+
+        private double startAngleGoBack;
+        private double curAngleGoBack;
+        private int timeCorrect; // calcolato su 50 ms
+        private Boolean beginCountTurning;
+        private int countTurning; //contatore per quando si sta girando (ogni 50 ms +1)
+        private int timeXTurn;
+        private int timeYTurn;
+        private Boolean correctOrientation;
+        private int orientCounter;
+        private Boolean correctingFlag;
+        private Boolean correctSxFlag;
+
         public ROVER()
         {
             InitializeComponent();
@@ -75,6 +89,17 @@ namespace roverControl
             this.timeRotateLeft = 0;
             this.timeRotateRight = 0;
             this.angleRotate = 0;
+            this.startAngleGoBack = 0;
+            this.curAngleGoBack = 0;
+            this.beginCountTurning = false;
+            this.countTurning = 0;
+            this.timeXTurn = 0;
+            this.timeYTurn = 0;
+            this.correctOrientation = false;
+            this.orientCounter = 0;
+            this.correctingFlag = false;
+            this.timeCorrect = 0;
+            this.correctSxFlag = false;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -161,9 +186,35 @@ namespace roverControl
 
         private void commandTimer_Tick(object sender, EventArgs e)
         {
+            if (this.correctOrientation)
+            {
+                if(this.orientCounter < this.timeCorrect && !this.correctingFlag && !this.correctSxFlag) //36,04   34,77   37,93   37,97   36,28   38,23   37,41  -> media 37 gradi al secondo (speed 2)
+                {
+                    this.comOutBuf = "Z" + 2;
+                    this.correctingFlag = true;
+                }
+                else if (this.orientCounter < this.timeCorrect && !this.correctingFlag && this.correctSxFlag)
+                {
+                    this.comOutBuf = "C" + 2;
+                    this.correctingFlag = true;
+                }
+                else if(this.orientCounter >= this.timeCorrect)
+                {
+                    this.comOutBuf = "X";
+                    this.correctOrientation = false;
+                    this.correctingFlag= false;
+                }
+                this.orientCounter++;
+            }
+
             if(comOutBuf != null && serialPort.IsOpen)
                 serialPort.Write(comOutBuf);
             comOutBuf = null;
+
+            if (this.beginCountTurning)
+            {
+                this.countTurning++;
+            }
         }
         private void ROVER_KeyDown(object sender, KeyEventArgs e)
         {
@@ -172,7 +223,7 @@ namespace roverControl
             if ((e.KeyCode == Keys.W || e.KeyCode == Keys.A || e.KeyCode == Keys.S || e.KeyCode == Keys.D) && this.direction == Direction.none)
             {
                 this.startTargetAngle = this.currentAngle;
-                this.timerCS.Enabled = true;
+                //this.timerCS.Enabled = true; //messo a true nel form
                 this.testRunning = true;
                 this.timeRotateLeft = 0;
                 this.timeRotateRight = 0;
@@ -224,14 +275,14 @@ namespace roverControl
             if (e.KeyCode == Keys.F && this.pressedKeys.Count == 0)
             {
                 comOutBuf = "Q" + this.roverSpeed + new String(this.dirBuf) + new String(this.angSpeedBuf);
-                //this.portBox.Text = comOutBuf;
+                this.beginCountTurning = true;
                 this.pressedKeys.Add(e.KeyCode);
             }
 
             if (e.KeyCode == Keys.G && this.pressedKeys.Count == 0)
             {
                 comOutBuf = "E" + this.roverSpeed + new String(this.dirBuf) + new String(this.angSpeedBuf);
-                //this.portBox.Text = comOutBuf;
+                this.beginCountTurning = true;
                 this.pressedKeys.Add(e.KeyCode);
             }
 
@@ -293,6 +344,8 @@ namespace roverControl
             if (e.KeyCode == Keys.F || e.KeyCode == Keys.G)
             {
                 comOutBuf = "X";
+                this.manageEndTurn();
+                this.beginCountTurning = false;
                 this.pressedKeys.Remove(e.KeyCode);
             }
 
@@ -313,11 +366,30 @@ namespace roverControl
             this.impulseCountForward = 0;
             this.impulseCountRight = 0;
             this.dontRead = true;
+
+            this.startAngleGoBack = this.currentAngle;
         }
 
         private void goBackButton_Click(object sender, EventArgs e)
         {
-            comOutBuf = "G";
+            //raddrizzare il rovere e azzerare il contatore spostandosi prima di cominciare con il goBack {}
+            
+            this.orientCounter = 0;
+            this.correctOrientation = true;
+            this.correctSxFlag = false;
+
+            this.curAngleGoBack = this.currentAngle;
+            this.timeCorrect = (int)((this.curAngleGoBack - this.startAngleGoBack) * 20 / 37);  //  20/37 -> tempo per fare un grado
+
+            if(this.timeCorrect < 0)
+            {
+                this.timeCorrect *= -1;
+                this.correctSxFlag = true;
+            }
+            //aspetta che finisca la correzione
+            while (this.correctOrientation) ;  //errore, non fa chiamare l'interrupt
+
+            this.comOutBuf = "G";
         }
 
         private void gyroPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
@@ -488,6 +560,28 @@ namespace roverControl
     }         
         }
     */
+        private void manageEndTurn()
+        {
+            double vx, vy;
+
+            int speed = this.roverSpeed * 10; ///test prima senza convertire
+            int direction = this.directionRov;
+            double angRate = this.angularSpeedRov;
+            int timeTurn = this.countTurning;  // *50 ms
+            double rad_per_deg = Math.PI / 180;
+
+            vx = speed * Math.Cos(direction * rad_per_deg);
+            vy = speed * Math.Sin(direction * rad_per_deg);
+
+            //variabili globali dx e dy riferite alla velocità minima (10) e moltiplicate per il tempo (50ms)
+            //dx = vx *(10/vx) * timeTurn ::::: -> timeDx = dx / roverSpeed
+            //problema : potrò muovermi solo a velocità multiple di 10
+
+            this.timeXTurn += (int)(timeTurn * 10 / vx);
+            this.timeYTurn += (int)(timeTurn * 10 / vy);
+
+            //azzeramento del tempo dopo la funzione
+        }
         private void directionBox_TextChanged(object sender, EventArgs e)
         {
             int.TryParse(this.directionBox.Text.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out this.directionRov);

@@ -59,6 +59,8 @@ int commandReceivedFlag;  //flag di interruzione se si riceve un comando durante
 int checkRx;
 Direction roverDirection;
 
+int dontCountImpulse;
+
 int bufOutReady;
 
 typedef struct{
@@ -132,6 +134,7 @@ int main(void)
   commandReceivedFlag = 0;
   roverDirection = none;
   bufOutReady = 1;
+  dontCountImpulse = 0;
   
   HAL_UART_Receive_IT(&huart3,comINbuf,1); //riceve il primo byte e fa scattare interrupt
   
@@ -362,6 +365,8 @@ void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF],int speed, int
     comBufOutRov[1][1] = -1 * realSpeed;
     comBufOutRov[2][1] = realSpeed;
     comBufOutRov[3][1] = -1 * realSpeed;
+    
+    dontCountImpulse = 1;
   }
   
   //rotazione a destra
@@ -370,6 +375,8 @@ void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF],int speed, int
     comBufOutRov[1][1] = realSpeed;
     comBufOutRov[2][1] = -1 * realSpeed;
     comBufOutRov[3][1] = realSpeed;
+    
+    dontCountImpulse = 1;
   }
   
   //avanti sx in diagonale
@@ -483,12 +490,14 @@ void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF],int speed, int
   
   //rotazione con velocità angolare
   if(str[0] == 'Q'){
+    dontCountImpulse = 1;
     //convert angular_rate
     angular_rate_rov /= 10;
     setVelocity(realSpeed * rover.speed_to_mm,direction_rov,angular_rate_rov,0);
   }
   
   if(str[0] == 'E'){
+    dontCountImpulse = 1;
     //convert angular_rate
     angular_rate_rov /= 10;
     setVelocity(realSpeed * rover.speed_to_mm,direction_rov,angular_rate_rov,1);
@@ -559,9 +568,8 @@ int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag){
       bufOut[1] = commandBufOutRov[0][1];
       bufOut[2] = commandBufOutRov[1][1];
       bufOut[3] = commandBufOutRov[2][1];
-      bufOut[4] = commandBufOutRov[3][1];
-      
-      
+      bufOut[4] = commandBufOutRov[3][1];       
+        
       HAL_I2C_Master_Transmit_IT(&hi2c1,0x34 << 1,bufOut,sizeof(uint8_t) * 5); 
       
       if(impulseResetFlag) {
@@ -570,15 +578,16 @@ int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag){
         impulseResetFlag = 0;
       }
       
-      
-      ////////////da modificare 
       if(bufOut[1] > 90 && bufOut[3] > 90) roverDirection = left;
       else if(bufOut[1] > 0 && bufOut[3] > 90) roverDirection = forward;
       else if(bufOut[1] > 90 && bufOut[3] > 0) roverDirection = backwards;  
       else if(bufOut[1] > 0 && bufOut[3] > 0) roverDirection = right;
       else roverDirection = none;
-      /////////////////////////
       
+      if(dontCountImpulse){ //utilizzato quando si gira e quando si ruota su se stessi
+        roverDirection = none;
+      }
+      dontCountImpulse = 0;
 }
 int checkCommand(char *str){
   errorCommand = 0;
