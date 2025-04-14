@@ -13,13 +13,14 @@ static void UART_Init(void);
 void Timer_Init();
 void I2C_Init();
 void Init_RovBuf(uint8_t commandBufOutRov[4][RXSIZEBUF]);
-int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag);
+int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag, int backTracking);
 int checkCommandRov(char *str, int *time, int *speed,int *direction_rov, float *angular_rate_rov);
 void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF], int speed,int direction_rov, float angular_rate_rov);
 void setVelocity(int velocity, int direction, float angular_rate, int backFlag);
 void speedConvert(float *v_s);
 int checkCommand(char *str);
 void goBack();
+void resetBacktracking();
 
 typedef enum state{ off = 0, on = 1} State;
 typedef enum direction{forward = 0, right = 1, backwards = 2, left = 3, none = 4} Direction;
@@ -118,7 +119,7 @@ int main(void)
   Timer_Init();
   I2C_Init();
   Init_RovBuf(commandBufOutRov);
-  TransmitCommand(commandBufOutRov,1);
+  //TransmitCommand(commandBufOutRov,1);
   
   sysClkSpeed = HAL_RCC_GetSysClockFreq();
   
@@ -176,7 +177,7 @@ int main(void)
       //timer start timeRov
       if(!errorCommandRover){
         TranslateCommand(comINbuf,commandBufOutRov,speedRov,direction_rov,angular_rate_rov);
-        TransmitCommand(commandBufOutRov,0);
+        TransmitCommand(commandBufOutRov,0,0);
       }
       moveTick = 0;
       numBytesIN = 0;
@@ -268,6 +269,7 @@ int checkCommandRov(char *str,int *time, int *speed,int *direction_rov, float *a
     if(strlen(str) > 1){
       if(str[1] == 'R'){
         impulseResetFlag = 1;
+        resetBacktracking();
       }
     }
     return error;
@@ -346,6 +348,7 @@ void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF],int speed, int
   
   if(str[0] == 'G'){
     goBack();
+    resetBacktracking();
     comBufOutRov[0][1] = 0;
     comBufOutRov[1][1] = 0;
     comBufOutRov[2][1] = 0;
@@ -576,7 +579,7 @@ void speedConvert(float *speed){
   *speed = (int)(*speed);
 }
   
-int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag){
+int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag, int backTracking){
       uint8_t bufOut[5];
       if(stopFlag) {
         Init_RovBuf(commandBufOutRov);
@@ -591,9 +594,10 @@ int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag){
       
       HAL_I2C_Master_Transmit_IT(&hi2c1,0x34 << 1,bufOut,sizeof(uint8_t) * 5);
       
-      if(commandStarted) backTrackingCommands[currentCommandTrack-1].time = commandTimerTrack;
+      if(commandStarted && !backTracking) backTrackingCommands[currentCommandTrack-1].time = commandTimerTrack;
         
       commandTimerTrack = 0; //reset del contatore (sempre)
+      
       
       if(bufOut[1] == 0 && bufOut[2] == 0 && bufOut[3] == 0 && bufOut[4] == 0){
         commandStarted = 0;
@@ -601,7 +605,9 @@ int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag){
         return 1;
       }
       
-      if(!commandStarted) commandStarted = 1; //attiva il contatore
+      if(!commandStarted) commandStarted = 1; //attiva il contatore  (commandStarted deve riattivarsi durante il backTracking)
+      
+      if(backTracking) return 2;
       
       backTrackingCommands[currentCommandTrack].v0 = bufOut[1];
       backTrackingCommands[currentCommandTrack].v1 = bufOut[2];
@@ -651,42 +657,44 @@ int checkCommand(char *str){
 
 void goBack(){
   checkRx = 1; // se si riceve un comando durante il goBack si interrompe il ritorno e si resettano gli impulsi
-  char buf[8];
-  if(impulseCountEngRight > 0){
-    sprintf(buf,"L%d",speedRov);
-    TranslateCommand(buf,commandBufOutRov,speedRov,0,0);
-    TransmitCommand(commandBufOutRov,0);
-    while(impulseCountEngRight > 0 && !commandReceivedFlag);
-    //TransmitCommand(commandBufOutRov,1); //ridondante, gia viene trasmesso dal main
+  short time;
+  commandBufOutRov[0][0] = 51; //ridondante
+  for(int indexCommand = currentCommandTrack-1; indexCommand >= 0; indexCommand--){
+    commandBufOutRov[0][1] = -backTrackingCommands[indexCommand].v0;
+    commandBufOutRov[1][1] = -backTrackingCommands[indexCommand].v1;
+    commandBufOutRov[2][1] = -backTrackingCommands[indexCommand].v2;
+    commandBufOutRov[3][1] = -backTrackingCommands[indexCommand].v3;
+    time = backTrackingCommands[indexCommand].time;
+    TransmitCommand(commandBufOutRov,0,1);
+    while(commandTimerTrack < time);
   }
-  else if(impulseCountEngRight < 0){
-    sprintf(buf,"R%d",speedRov);
-    TranslateCommand(buf,commandBufOutRov,speedRov,0,0);
-    TransmitCommand(commandBufOutRov,0);
-    while(impulseCountEngRight < 0 && !commandReceivedFlag);
-    //TransmitCommand(commandBufOutRov,1); //ridondante, gia viene trasmesso dal main
-  }
-  HAL_Delay(500); //prova per efficienza
-  if(impulseCountEngForw > 0){
-    sprintf(buf,"B%d",speedRov);
-    TranslateCommand(buf,commandBufOutRov,speedRov,0,0);
-    TransmitCommand(commandBufOutRov,0);
-    while(impulseCountEngForw > 0 && !commandReceivedFlag);
-    //TransmitCommand(commandBufOutRov,1); //ridondante, gia viene trasmesso dal main
-  }
-  else if(impulseCountEngForw < 0){
-    sprintf(buf,"F%d",speedRov);
-    TranslateCommand(buf,commandBufOutRov,speedRov,0,0);
-    TransmitCommand(commandBufOutRov,0);
-    while(impulseCountEngForw < 0 && !commandReceivedFlag);
-    //TransmitCommand(commandBufOutRov,1); //ridondante, gia viene trasmesso dal main
-  }
+    
+  //fine backtracking  -> ridondante(gia nel main)
+  //commandBufOutRov[0][1] = 0;
+  //commandBufOutRov[1][1] = 0;
+  //commandBufOutRov[2][1] = 0;
+  //commandBufOutRov[3][1] = 0;
+  //TransmitCommand(commandBufOutRov,0,1);
+    
   
   // azzeramento impulsi nelle due direzioni
   impulseCountEngForw = 0;
   impulseCountEngRight = 0;
   checkRx = 0;
   commandReceivedFlag = 0;
+}
+
+void resetBacktracking(){
+  for(int i=0;i<currentCommandTrack;i++){
+    backTrackingCommands[i].v0 = 0;
+    backTrackingCommands[i].v1 = 0;
+    backTrackingCommands[i].v2 = 0;
+    backTrackingCommands[i].v3 = 0;
+    backTrackingCommands[i].time = 0;
+  }
+  currentCommandTrack = 0;
+  commandTimerTrack = 0;
+  commandStarted = 0;
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
