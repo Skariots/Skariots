@@ -214,7 +214,7 @@
             // 
             // gyroTimer
             // 
-            this.gyroTimer.Interval = 500;
+            this.gyroTimer.Interval = 50;
             this.gyroTimer.Tick += new System.EventHandler(this.gyroTimer_Tick);
             // 
             // rotateRightButton
@@ -260,6 +260,7 @@
             // timerCS
             // 
             this.timerCS.Enabled = true;
+            this.timerCS.Interval = 50;
             this.timerCS.Tick += new System.EventHandler(this.timerCS_Tick);
             // 
             // directionBox
