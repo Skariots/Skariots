@@ -4,6 +4,7 @@
 #define DEVICE_ADDRESS 0x34
 #define OFFSET_TO_SPEED 0.20
 #define PI 3.14159265
+#define NCOMMANDS 500
 
 void SystemClock_Config(void);
 static void MPU_Config(void);
@@ -62,6 +63,20 @@ Direction roverDirection;
 int dontCountImpulse;
 
 int bufOutReady;
+
+typedef struct c_info{
+  short v0;
+  short v1;
+  short v2;
+  short v3;
+  short time;
+}CommandInfo;
+
+CommandInfo backTrackingCommands[NCOMMANDS] = {0};  //vettore di struct contenente le informazioni mandate ai motori e per quanto tempo
+int currentCommandTrack; //indice corrente nel vettore di comandi
+int commandTimerTrack; //contatore per il tempo
+int commandStarted; //flag che indica se si deve cominciare a contare il tempo (appena arriva il primo comando)
+int resetCommandsFlag; //flag attivato da un comando da seriale (resetta il punto di partenza)
 
 typedef struct{
   float a;
@@ -135,6 +150,9 @@ int main(void)
   roverDirection = none;
   bufOutReady = 1;
   dontCountImpulse = 0;
+  currentCommandTrack = 0;
+  commandTimerTrack = 0;
+  commandStarted = 0;
   
   HAL_UART_Receive_IT(&huart3,comINbuf,1); //riceve il primo byte e fa scattare interrupt
   
@@ -569,8 +587,28 @@ int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag){
       bufOut[2] = commandBufOutRov[1][1];
       bufOut[3] = commandBufOutRov[2][1];
       bufOut[4] = commandBufOutRov[3][1];       
+      
+      
+      HAL_I2C_Master_Transmit_IT(&hi2c1,0x34 << 1,bufOut,sizeof(uint8_t) * 5);
+      
+      if(commandStarted) backTrackingCommands[currentCommandTrack-1].time = commandTimerTrack;
         
-      HAL_I2C_Master_Transmit_IT(&hi2c1,0x34 << 1,bufOut,sizeof(uint8_t) * 5); 
+      commandTimerTrack = 0; //reset del contatore (sempre)
+      
+      if(bufOut[1] == 0 && bufOut[2] == 0 && bufOut[3] == 0 && bufOut[4] == 0){
+        commandStarted = 0;
+        commandTimerTrack = 0;
+        return 1;
+      }
+      
+      if(!commandStarted) commandStarted = 1; //attiva il contatore
+      
+      backTrackingCommands[currentCommandTrack].v0 = bufOut[1];
+      backTrackingCommands[currentCommandTrack].v1 = bufOut[2];
+      backTrackingCommands[currentCommandTrack].v2 = bufOut[3];
+      backTrackingCommands[currentCommandTrack].v3 = bufOut[4];
+      
+      currentCommandTrack ++;
       
       if(impulseResetFlag) {
         impulseCountEngForw = 0;
@@ -814,6 +852,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
       timeout++;
       moveTick++;
       timeCountRov++;
+      if(commandStarted) commandTimerTrack++;  
 //      timePrintImpulse++;
     }
 }
