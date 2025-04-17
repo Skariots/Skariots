@@ -59,6 +59,10 @@
             this.impForwTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.distTextBox = new System.Windows.Forms.TextBox();
+            this.distLabel = new System.Windows.Forms.Label();
+            this.realAngleTextBox = new System.Windows.Forms.TextBox();
+            this.realAngleLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // serialPort
@@ -94,7 +98,7 @@
             // 
             // forwardButton
             // 
-            this.forwardButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.forwardButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.forwardButton.BackColor = System.Drawing.SystemColors.Control;
             this.forwardButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 19.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.forwardButton.Location = new System.Drawing.Point(127, 241);
@@ -106,7 +110,7 @@
             // 
             // rightButton
             // 
-            this.rightButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.rightButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.rightButton.BackColor = System.Drawing.SystemColors.Control;
             this.rightButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 19.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.rightButton.Location = new System.Drawing.Point(177, 322);
@@ -119,7 +123,7 @@
             // 
             // backwardsButton
             // 
-            this.backwardsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.backwardsButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.backwardsButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 19.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.backwardsButton.Location = new System.Drawing.Point(127, 376);
             this.backwardsButton.Name = "backwardsButton";
@@ -130,7 +134,7 @@
             // 
             // leftButton
             // 
-            this.leftButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.leftButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.leftButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 19.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.leftButton.Location = new System.Drawing.Point(51, 322);
             this.leftButton.Name = "leftButton";
@@ -295,11 +299,11 @@
             // angularSpeedLabel
             // 
             this.angularSpeedLabel.AutoSize = true;
-            this.angularSpeedLabel.Location = new System.Drawing.Point(519, 400);
+            this.angularSpeedLabel.Location = new System.Drawing.Point(454, 400);
             this.angularSpeedLabel.Name = "angularSpeedLabel";
-            this.angularSpeedLabel.Size = new System.Drawing.Size(38, 16);
+            this.angularSpeedLabel.Size = new System.Drawing.Size(106, 16);
             this.angularSpeedLabel.TabIndex = 20;
-            this.angularSpeedLabel.Text = "rad/s";
+            this.angularSpeedLabel.Text = "ang speed rad/s";
             // 
             // impRigTextBox
             // 
@@ -341,11 +345,52 @@
             this.label2.TabIndex = 24;
             this.label2.Text = "right";
             // 
+            // distTextBox
+            // 
+            this.distTextBox.Location = new System.Drawing.Point(615, 376);
+            this.distTextBox.Name = "distTextBox";
+            this.distTextBox.Size = new System.Drawing.Size(100, 22);
+            this.distTextBox.TabIndex = 25;
+            this.distTextBox.Text = "0";
+            this.distTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.distTextBox.TextChanged += new System.EventHandler(this.distTextBox_TextChanged);
+            // 
+            // distLabel
+            // 
+            this.distLabel.AutoSize = true;
+            this.distLabel.Location = new System.Drawing.Point(649, 401);
+            this.distLabel.Name = "distLabel";
+            this.distLabel.Size = new System.Drawing.Size(66, 16);
+            this.distLabel.TabIndex = 26;
+            this.distLabel.Text = "distY /mm";
+            // 
+            // realAngleTextBox
+            // 
+            this.realAngleTextBox.Location = new System.Drawing.Point(269, 79);
+            this.realAngleTextBox.Name = "realAngleTextBox";
+            this.realAngleTextBox.ReadOnly = true;
+            this.realAngleTextBox.Size = new System.Drawing.Size(90, 22);
+            this.realAngleTextBox.TabIndex = 27;
+            this.realAngleTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // realAngleLabel
+            // 
+            this.realAngleLabel.AutoSize = true;
+            this.realAngleLabel.Location = new System.Drawing.Point(221, 85);
+            this.realAngleLabel.Name = "realAngleLabel";
+            this.realAngleLabel.Size = new System.Drawing.Size(42, 16);
+            this.realAngleLabel.TabIndex = 28;
+            this.realAngleLabel.Text = "Serial";
+            // 
             // ROVER
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(964, 570);
+            this.Controls.Add(this.realAngleLabel);
+            this.Controls.Add(this.realAngleTextBox);
+            this.Controls.Add(this.distLabel);
+            this.Controls.Add(this.distTextBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.impForwTextBox);
@@ -415,6 +460,10 @@
         private System.Windows.Forms.TextBox impForwTextBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox distTextBox;
+        private System.Windows.Forms.Label distLabel;
+        private System.Windows.Forms.TextBox realAngleTextBox;
+        private System.Windows.Forms.Label realAngleLabel;
     }
 }
 
