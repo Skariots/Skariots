@@ -109,17 +109,14 @@ int main(void)
   MPU_Config();
   HAL_Init();
 
-  // Configure the system clock
   SystemClock_Config();
 
-  // Initialize all configured peripherals
   MX_GPIO_Init();
   
   UART_Init();
   Timer_Init();
   I2C_Init();
   Init_RovBuf(commandBufOutRov);
-  //TransmitCommand(commandBufOutRov,1);
   
   sysClkSpeed = HAL_RCC_GetSysClockFreq();
   
@@ -159,14 +156,6 @@ int main(void)
   
   while (1)
   {
-//    if(timePrintImpulse > 1000 && impulseCountEngForw > 0){
-//      sprintf(comOUTbufImpulse1,"ENG1:%d\n",impulseCountEngForw);
-//      HAL_UART_Transmit_IT(&huart3,(uint8_t *)comOUTbufImpulse1,strlen(comOUTbufImpulse1));
-//      HAL_Delay(10);
-//      sprintf(comOUTbufImpulse3,"ENG3:%d\n",impulseCountEngForw);
-//      HAL_UART_Transmit_IT(&huart3,(uint8_t *)comOUTbufImpulse3,strlen(comOUTbufImpulse3));
-//      timePrintImpulse = 0;
-//    }
     if(moveTick >= 100 && numBytesIN > 0){ // > 1 per il \n aggiunto su seriale
       if(comINbuf[strlen(comINbuf)-1] == '\n') comINbuf[strlen(comINbuf)-1] = '\0'; // strip del \n
       //strcpy(comOUTbuf,comINbuf);
@@ -203,19 +192,6 @@ int main(void)
       }
       numBytesIN = 0;
     }
-//    else if (numBytesIN>0)
-//    {   // numero caratteri insufficiente
-//        if (timeout>10)
-//        {
-//            numBytesIN = 0;
-//            strcpy(comINbuf,"");
-//            timeout=0;
-//        }
-//    }
-//    else
-//    {   // niente su seriale
-//      timeout=0;
-//    }
     if(speedArray[0] == 's' && ledState[0] == off){
         HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin,GPIO_PIN_SET);
         ledState[0] = on;
@@ -242,7 +218,6 @@ int main(void)
       }
 
   }
-  /* USER CODE END 3 */
 }
 void Init_RovBuf(uint8_t comBufOutRov[][RXSIZEBUF]){
   comBufOutRov[0][0] = 51;
@@ -326,17 +301,6 @@ int checkCommandRov(char *str,int *time, int *speed,int *direction_rov, float *a
       return error;
     }
   }
-//  if(strlen(str) == 2){
-//    *time = 9999;
-//  }
-//  else{
-//    strncpy(timeStr,str+2,4);
-//    timeStr[4] = '\0';
-//    if(((*time) = atoi(timeStr)) == 0){
-//      error = 1;
-//      return error;
-//    }
-//  }
   return error;
 }
 
@@ -592,20 +556,19 @@ int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag, int bac
       bufOut[4] = commandBufOutRov[3][1];       
       
       
-      HAL_I2C_Master_Transmit_IT(&hi2c1,0x34 << 1,bufOut,sizeof(uint8_t) * 5);
-      
       if(commandStarted && !backTracking) backTrackingCommands[currentCommandTrack-1].time = commandTimerTrack;
         
       commandTimerTrack = 0; //reset del contatore (sempre)
       
+      if(!commandStarted) commandStarted = 1; //attiva il contatore  (commandStarted deve riattivarsi durante il backTracking)  
+      
+      HAL_I2C_Master_Transmit_IT(&hi2c1,0x34 << 1,bufOut,sizeof(uint8_t) * 5);  //trasmissione dei dati messa in mezzo al codice per il backtrack per minimizzare i ritardi
       
       if(bufOut[1] == 0 && bufOut[2] == 0 && bufOut[3] == 0 && bufOut[4] == 0){
         commandStarted = 0;
         commandTimerTrack = 0;
         return 1;
       }
-      
-      if(!commandStarted) commandStarted = 1; //attiva il contatore  (commandStarted deve riattivarsi durante il backTracking)
       
       if(backTracking) return 2;
       

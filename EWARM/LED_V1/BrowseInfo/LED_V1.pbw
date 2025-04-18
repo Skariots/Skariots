@@ -369630,13 +369630,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@5787@F@main@i",
+    "ID": "c:main.c@5213@F@main@i",
     "What": "Variable",
     "defdec": "Def",
     "display": "i",
     "location": {
       "column": "15",
-      "line": "184",
+      "line": "173",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "i",
@@ -369650,7 +369650,7 @@
     "display": "void Init_RovBuf(uint8_t (*)[128])",
     "location": {
       "column": "6",
-      "line": "247",
+      "line": "222",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "Init_RovBuf",
@@ -369664,7 +369664,7 @@
     "display": "int checkCommandRov(char *, int *, int *, int *, float *)",
     "location": {
       "column": "5",
-      "line": "259",
+      "line": "234",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "checkCommandRov",
@@ -369672,13 +369672,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@8420@F@checkCommandRov@error",
+    "ID": "c:main.c@7518@F@checkCommandRov@error",
     "What": "Variable",
     "defdec": "Def",
     "display": "error",
     "location": {
       "column": "7",
-      "line": "262",
+      "line": "237",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "error",
@@ -369686,13 +369686,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@8438@F@checkCommandRov@tmpStr",
+    "ID": "c:main.c@7536@F@checkCommandRov@tmpStr",
     "What": "Variable",
     "defdec": "Def",
     "display": "tmpStr",
     "location": {
       "column": "8",
-      "line": "263",
+      "line": "238",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "tmpStr",
@@ -369700,13 +369700,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@8458@F@checkCommandRov@value_angle",
+    "ID": "c:main.c@7556@F@checkCommandRov@value_angle",
     "What": "Variable",
     "defdec": "Def",
     "display": "value_angle",
     "location": {
       "column": "7",
-      "line": "264",
+      "line": "239",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "value_angle",
@@ -369714,13 +369714,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@8482@F@checkCommandRov@speedStr",
+    "ID": "c:main.c@7580@F@checkCommandRov@speedStr",
     "What": "Variable",
     "defdec": "Def",
     "display": "speedStr",
     "location": {
       "column": "8",
-      "line": "265",
+      "line": "240",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "speedStr",
@@ -369734,7 +369734,7 @@
     "display": "void TranslateCommand(char *, uint8_t (*)[128], int, int, float)",
     "location": {
       "column": "6",
-      "line": "343",
+      "line": "307",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "TranslateCommand",
@@ -369742,13 +369742,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@10535@F@TranslateCommand@realSpeed",
+    "ID": "c:main.c@9406@F@TranslateCommand@realSpeed",
     "What": "Variable",
     "defdec": "Def",
     "display": "realSpeed",
     "location": {
       "column": "7",
-      "line": "347",
+      "line": "311",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "realSpeed",
@@ -369762,7 +369762,7 @@
     "display": "void setVelocity(int, int, float, int)",
     "location": {
       "column": "6",
-      "line": "530",
+      "line": "494",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "setVelocity",
@@ -369770,13 +369770,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@15978@F@setVelocity@rad_per_deg",
+    "ID": "c:main.c@14849@F@setVelocity@rad_per_deg",
     "What": "Variable",
     "defdec": "Def",
     "display": "rad_per_deg",
     "location": {
       "column": "9",
-      "line": "531",
+      "line": "495",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "rad_per_deg",
@@ -369784,13 +369784,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@16000@F@setVelocity@vx",
+    "ID": "c:main.c@14871@F@setVelocity@vx",
     "What": "Variable",
     "defdec": "Def",
     "display": "vx",
     "location": {
       "column": "9",
-      "line": "532",
+      "line": "496",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "vx",
@@ -369798,13 +369798,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@16000@F@setVelocity@vy",
+    "ID": "c:main.c@14871@F@setVelocity@vy",
     "What": "Variable",
     "defdec": "Dec",
     "display": "vy",
     "location": {
       "column": "12",
-      "line": "532",
+      "line": "496",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "vy",
@@ -369812,13 +369812,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@16000@F@setVelocity@vp",
+    "ID": "c:main.c@14871@F@setVelocity@vp",
     "What": "Variable",
     "defdec": "Dec",
     "display": "vp",
     "location": {
       "column": "15",
-      "line": "532",
+      "line": "496",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "vp",
@@ -369826,13 +369826,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@16000@F@setVelocity@v1",
+    "ID": "c:main.c@14871@F@setVelocity@v1",
     "What": "Variable",
     "defdec": "Dec",
     "display": "v1",
     "location": {
       "column": "18",
-      "line": "532",
+      "line": "496",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "v1",
@@ -369840,13 +369840,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@16000@F@setVelocity@v2",
+    "ID": "c:main.c@14871@F@setVelocity@v2",
     "What": "Variable",
     "defdec": "Dec",
     "display": "v2",
     "location": {
       "column": "21",
-      "line": "532",
+      "line": "496",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "v2",
@@ -369854,13 +369854,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@16000@F@setVelocity@v3",
+    "ID": "c:main.c@14871@F@setVelocity@v3",
     "What": "Variable",
     "defdec": "Dec",
     "display": "v3",
     "location": {
       "column": "24",
-      "line": "532",
+      "line": "496",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "v3",
@@ -369868,13 +369868,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@16000@F@setVelocity@v4",
+    "ID": "c:main.c@14871@F@setVelocity@v4",
     "What": "Variable",
     "defdec": "Dec",
     "display": "v4",
     "location": {
       "column": "27",
-      "line": "532",
+      "line": "496",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "v4",
@@ -369882,13 +369882,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@16031@F@setVelocity@v_s",
+    "ID": "c:main.c@14902@F@setVelocity@v_s",
     "What": "Variable",
     "defdec": "Def",
     "display": "v_s",
     "location": {
       "column": "9",
-      "line": "533",
+      "line": "497",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "v_s",
@@ -369896,13 +369896,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@16658@F@setVelocity@i",
+    "ID": "c:main.c@15529@F@setVelocity@i",
     "What": "Variable",
     "defdec": "Def",
     "display": "i",
     "location": {
       "column": "12",
-      "line": "560",
+      "line": "524",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "i",
@@ -369916,7 +369916,7 @@
     "display": "void speedConvert(float *)",
     "location": {
       "column": "6",
-      "line": "577",
+      "line": "541",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "speedConvert",
@@ -369930,7 +369930,7 @@
     "display": "int TransmitCommand(uint8_t (*)[128], int, int)",
     "location": {
       "column": "5",
-      "line": "582",
+      "line": "546",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "TransmitCommand",
@@ -369938,13 +369938,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@17226@F@TransmitCommand@bufOut",
+    "ID": "c:main.c@16097@F@TransmitCommand@bufOut",
     "What": "Variable",
     "defdec": "Def",
     "display": "bufOut",
     "location": {
       "column": "15",
-      "line": "583",
+      "line": "547",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "bufOut",
@@ -369958,7 +369958,7 @@
     "display": "int checkCommand(char *)",
     "location": {
       "column": "5",
-      "line": "636",
+      "line": "599",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "checkCommand",
@@ -369972,7 +369972,7 @@
     "display": "void goBack(void)",
     "location": {
       "column": "6",
-      "line": "658",
+      "line": "621",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "goBack",
@@ -369980,13 +369980,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@19781@F@goBack@time",
+    "ID": "c:main.c@18739@F@goBack@time",
     "What": "Variable",
     "defdec": "Def",
     "display": "time",
     "location": {
       "column": "9",
-      "line": "660",
+      "line": "623",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "time",
@@ -369994,13 +369994,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@19845@F@goBack@indexCommand",
+    "ID": "c:main.c@18803@F@goBack@indexCommand",
     "What": "Variable",
     "defdec": "Def",
     "display": "indexCommand",
     "location": {
       "column": "11",
-      "line": "662",
+      "line": "625",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "indexCommand",
@@ -370014,7 +370014,7 @@
     "display": "void resetBacktracking(void)",
     "location": {
       "column": "6",
-      "line": "687",
+      "line": "650",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "resetBacktracking",
@@ -370022,13 +370022,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@20773@F@resetBacktracking@i",
+    "ID": "c:main.c@19731@F@resetBacktracking@i",
     "What": "Variable",
     "defdec": "Def",
     "display": "i",
     "location": {
       "column": "11",
-      "line": "688",
+      "line": "651",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "i",
@@ -370042,7 +370042,7 @@
     "display": "void HAL_UART_RxCpltCallback(UART_HandleTypeDef *)",
     "location": {
       "column": "6",
-      "line": "700",
+      "line": "663",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "HAL_UART_RxCpltCallback",
@@ -370050,13 +370050,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@21149@F@HAL_UART_RxCpltCallback@tmp",
+    "ID": "c:main.c@20107@F@HAL_UART_RxCpltCallback@tmp",
     "What": "Variable",
     "defdec": "Def",
     "display": "tmp",
     "location": {
       "column": "13",
-      "line": "702",
+      "line": "665",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "tmp",
@@ -370070,7 +370070,7 @@
     "display": "void HAL_UART_TxCpltCallback(UART_HandleTypeDef *)",
     "location": {
       "column": "6",
-      "line": "729",
+      "line": "692",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "HAL_UART_TxCpltCallback",
@@ -370078,13 +370078,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@21805@F@HAL_UART_TxCpltCallback@tmp",
+    "ID": "c:main.c@20763@F@HAL_UART_TxCpltCallback@tmp",
     "What": "Variable",
     "defdec": "Def",
     "display": "tmp",
     "location": {
       "column": "11",
-      "line": "730",
+      "line": "693",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "tmp",
@@ -370098,7 +370098,7 @@
     "display": "void USART2_IRQHandler(void)",
     "location": {
       "column": "6",
-      "line": "749",
+      "line": "712",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "USART2_IRQHandler",
@@ -370112,7 +370112,7 @@
     "display": "void USART3_IRQHandler(void)",
     "location": {
       "column": "6",
-      "line": "753",
+      "line": "716",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "USART3_IRQHandler",
@@ -370126,7 +370126,7 @@
     "display": "void TIM1_IRQHandler(void)",
     "location": {
       "column": "6",
-      "line": "757",
+      "line": "720",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "TIM1_IRQHandler",
@@ -370140,7 +370140,7 @@
     "display": "void TIM2_IRQHandler(void)",
     "location": {
       "column": "6",
-      "line": "761",
+      "line": "724",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "TIM2_IRQHandler",
@@ -370154,7 +370154,7 @@
     "display": "void TIM3_IRQHandler(void)",
     "location": {
       "column": "6",
-      "line": "765",
+      "line": "728",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "TIM3_IRQHandler",
@@ -370168,7 +370168,7 @@
     "display": "void TIM4_IRQHandler(void)",
     "location": {
       "column": "6",
-      "line": "769",
+      "line": "732",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "TIM4_IRQHandler",
@@ -370182,7 +370182,7 @@
     "display": "void I2C1_EV_IRQHandler(void)",
     "location": {
       "column": "6",
-      "line": "773",
+      "line": "736",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "I2C1_EV_IRQHandler",
@@ -370196,7 +370196,7 @@
     "display": "void EXTI3_IRQHandler(void)",
     "location": {
       "column": "6",
-      "line": "777",
+      "line": "740",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "EXTI3_IRQHandler",
@@ -370210,7 +370210,7 @@
     "display": "void EXTI4_IRQHandler(void)",
     "location": {
       "column": "6",
-      "line": "782",
+      "line": "745",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "EXTI4_IRQHandler",
@@ -370224,7 +370224,7 @@
     "display": "void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *)",
     "location": {
       "column": "6",
-      "line": "787",
+      "line": "750",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "HAL_I2C_MasterTxCpltCallback",
@@ -370238,7 +370238,7 @@
     "display": "void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *)",
     "location": {
       "column": "6",
-      "line": "794",
+      "line": "757",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "HAL_TIM_PeriodElapsedCallback",
@@ -370252,7 +370252,7 @@
     "display": "void HAL_GPIO_EXTI_Callback(uint16_t)",
     "location": {
       "column": "6",
-      "line": "868",
+      "line": "831",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "HAL_GPIO_EXTI_Callback",
@@ -370266,7 +370266,7 @@
     "display": "void SystemClock_Config(void)",
     "location": {
       "column": "6",
-      "line": "891",
+      "line": "854",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "SystemClock_Config",
@@ -370274,13 +370274,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@26537@F@SystemClock_Config@RCC_OscInitStruct",
+    "ID": "c:main.c@25495@F@SystemClock_Config@RCC_OscInitStruct",
     "What": "Variable",
     "defdec": "Def",
     "display": "RCC_OscInitStruct",
     "location": {
       "column": "22",
-      "line": "893",
+      "line": "856",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "RCC_OscInitStruct",
@@ -370288,13 +370288,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@26584@F@SystemClock_Config@RCC_ClkInitStruct",
+    "ID": "c:main.c@25542@F@SystemClock_Config@RCC_ClkInitStruct",
     "What": "Variable",
     "defdec": "Def",
     "display": "RCC_ClkInitStruct",
     "location": {
       "column": "22",
-      "line": "894",
+      "line": "857",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "RCC_ClkInitStruct",
@@ -370302,13 +370302,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@26792@F@SystemClock_Config@tmpreg",
+    "ID": "c:main.c@25750@F@SystemClock_Config@tmpreg",
     "What": "Variable",
     "defdec": "Def",
     "display": "tmpreg",
     "location": {
       "column": "3",
-      "line": "902",
+      "line": "865",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "tmpreg",
@@ -370322,7 +370322,7 @@
     "display": "void MX_GPIO_Init(void)",
     "location": {
       "column": "13",
-      "line": "942",
+      "line": "905",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "MX_GPIO_Init",
@@ -370330,13 +370330,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@28249@F@MX_GPIO_Init@GPIO_InitStruct",
+    "ID": "c:main.c@27207@F@MX_GPIO_Init@GPIO_InitStruct",
     "What": "Variable",
     "defdec": "Def",
     "display": "GPIO_InitStruct",
     "location": {
       "column": "20",
-      "line": "944",
+      "line": "907",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "GPIO_InitStruct",
@@ -370344,13 +370344,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@28401@F@MX_GPIO_Init@tmpreg",
+    "ID": "c:main.c@27359@F@MX_GPIO_Init@tmpreg",
     "What": "Variable",
     "defdec": "Def",
     "display": "tmpreg",
     "location": {
       "column": "3",
-      "line": "949",
+      "line": "912",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "tmpreg",
@@ -370358,13 +370358,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@28434@F@MX_GPIO_Init@tmpreg",
+    "ID": "c:main.c@27392@F@MX_GPIO_Init@tmpreg",
     "What": "Variable",
     "defdec": "Def",
     "display": "tmpreg",
     "location": {
       "column": "3",
-      "line": "950",
+      "line": "913",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "tmpreg",
@@ -370372,13 +370372,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@28467@F@MX_GPIO_Init@tmpreg",
+    "ID": "c:main.c@27425@F@MX_GPIO_Init@tmpreg",
     "What": "Variable",
     "defdec": "Def",
     "display": "tmpreg",
     "location": {
       "column": "3",
-      "line": "951",
+      "line": "914",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "tmpreg",
@@ -370386,13 +370386,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@28500@F@MX_GPIO_Init@tmpreg",
+    "ID": "c:main.c@27458@F@MX_GPIO_Init@tmpreg",
     "What": "Variable",
     "defdec": "Def",
     "display": "tmpreg",
     "location": {
       "column": "3",
-      "line": "952",
+      "line": "915",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "tmpreg",
@@ -370400,13 +370400,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@28533@F@MX_GPIO_Init@tmpreg",
+    "ID": "c:main.c@27491@F@MX_GPIO_Init@tmpreg",
     "What": "Variable",
     "defdec": "Def",
     "display": "tmpreg",
     "location": {
       "column": "3",
-      "line": "953",
+      "line": "916",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "tmpreg",
@@ -370420,7 +370420,7 @@
     "display": "void MPU_Config(void)",
     "location": {
       "column": "6",
-      "line": "1005",
+      "line": "968",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "MPU_Config",
@@ -370428,13 +370428,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@30343@F@MPU_Config@MPU_InitStruct",
+    "ID": "c:main.c@29301@F@MPU_Config@MPU_InitStruct",
     "What": "Variable",
     "defdec": "Def",
     "display": "MPU_InitStruct",
     "location": {
       "column": "26",
-      "line": "1007",
+      "line": "970",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "MPU_InitStruct",
@@ -370448,7 +370448,7 @@
     "display": "void UART_Init(void)",
     "location": {
       "column": "13",
-      "line": "1032",
+      "line": "995",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "UART_Init",
@@ -370456,13 +370456,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@31280@F@UART_Init@tmpreg",
+    "ID": "c:main.c@30238@F@UART_Init@tmpreg",
     "What": "Variable",
     "defdec": "Def",
     "display": "tmpreg",
     "location": {
       "column": "5",
-      "line": "1035",
+      "line": "998",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "tmpreg",
@@ -370470,13 +370470,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@31316@F@UART_Init@tmpreg",
+    "ID": "c:main.c@30274@F@UART_Init@tmpreg",
     "What": "Variable",
     "defdec": "Def",
     "display": "tmpreg",
     "location": {
       "column": "5",
-      "line": "1036",
+      "line": "999",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "tmpreg",
@@ -370484,13 +370484,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@31358@F@UART_Init@GPIO_InitStruct",
+    "ID": "c:main.c@30316@F@UART_Init@GPIO_InitStruct",
     "What": "Variable",
     "defdec": "Def",
     "display": "GPIO_InitStruct",
     "location": {
       "column": "22",
-      "line": "1038",
+      "line": "1001",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "GPIO_InitStruct",
@@ -370504,7 +370504,7 @@
     "display": "void Timer_Init(void)",
     "location": {
       "column": "6",
-      "line": "1086",
+      "line": "1049",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "Timer_Init",
@@ -370512,13 +370512,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@33498@F@Timer_Init@tmpreg",
+    "ID": "c:main.c@32456@F@Timer_Init@tmpreg",
     "What": "Variable",
     "defdec": "Def",
     "display": "tmpreg",
     "location": {
       "column": "3",
-      "line": "1087",
+      "line": "1050",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "tmpreg",
@@ -370526,13 +370526,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@33560@F@Timer_Init@tmpreg",
+    "ID": "c:main.c@32518@F@Timer_Init@tmpreg",
     "What": "Variable",
     "defdec": "Def",
     "display": "tmpreg",
     "location": {
       "column": "3",
-      "line": "1088",
+      "line": "1051",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "tmpreg",
@@ -370540,13 +370540,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@33622@F@Timer_Init@tmpreg",
+    "ID": "c:main.c@32580@F@Timer_Init@tmpreg",
     "What": "Variable",
     "defdec": "Def",
     "display": "tmpreg",
     "location": {
       "column": "3",
-      "line": "1089",
+      "line": "1052",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "tmpreg",
@@ -370560,7 +370560,7 @@
     "display": "void I2C_Init(void)",
     "location": {
       "column": "6",
-      "line": "1135",
+      "line": "1098",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "I2C_Init",
@@ -370568,13 +370568,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@35291@F@I2C_Init@tmpreg",
+    "ID": "c:main.c@34249@F@I2C_Init@tmpreg",
     "What": "Variable",
     "defdec": "Def",
     "display": "tmpreg",
     "location": {
       "column": "3",
-      "line": "1137",
+      "line": "1100",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "tmpreg",
@@ -370582,13 +370582,13 @@
     "scope": null
   },
   {
-    "ID": "c:main.c@35327@F@I2C_Init@GPIO_InitStruct",
+    "ID": "c:main.c@34285@F@I2C_Init@GPIO_InitStruct",
     "What": "Variable",
     "defdec": "Def",
     "display": "GPIO_InitStruct",
     "location": {
       "column": "20",
-      "line": "1139",
+      "line": "1102",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "GPIO_InitStruct",
@@ -370602,7 +370602,7 @@
     "display": "void Error_Handler(void)",
     "location": {
       "column": "6",
-      "line": "1174",
+      "line": "1137",
       "path": "C:\\Users\\lorrn\\Desktop\\Tirocinio\\STM32H743\\RXModeLed\\Core\\Src\\main.c"
     },
     "name": "Error_Handler",

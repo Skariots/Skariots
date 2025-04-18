@@ -70,7 +70,7 @@ namespace roverControl
         private double ANGLE_OFFSET_TOSPEED;
         private int distYDestination;
         private int preciseTurnCounter;
-        private double[,] distanceCoeff_speed;  //coefficienti della rette che legano la distanza y percorsa con l'angolo fatto per velocità da 0-6
+        private readonly double[,] distanceCoeff_speed;  //coefficienti della rette che legano la distanza y percorsa con l'angolo fatto per velocità da 0-6
         public ROVER()
         {
             InitializeComponent();
@@ -121,11 +121,18 @@ namespace roverControl
             this.distYDestination = 0;
             this.preciseTurnCounter = 0;
             this.distanceCoeff_speed = new double[6, 3];
-            ;
+
+            this.distanceCoeff_speed[1, 0] = -46.084;
+            this.distanceCoeff_speed[1, 1] = 14.826;
+            this.distanceCoeff_speed[1, 2] = -0.0806;
 
             this.distanceCoeff_speed[4,0] = -28.017;
             this.distanceCoeff_speed[4,1] = 14.962;
-            this.distanceCoeff_speed[4,2] = -0.082;
+            this.distanceCoeff_speed[4,2] = -0.082;            
+
+            this.distanceCoeff_speed[5, 0] = -36.454;
+            this.distanceCoeff_speed[5, 1] = 17.687;
+            this.distanceCoeff_speed[5, 2] = -0.0968;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -211,82 +218,7 @@ namespace roverControl
         }
 
         private void commandTimer_Tick(object sender, EventArgs e)
-        {
-            /*
-            if (this.correctOrientation)
-            {
-                if(this.orientCounter < this.timeCorrect && !this.correctingFlag && !this.correctSxFlag) //36,04   34,77   37,93   37,97   36,28   38,23   37,41  -> media 37 gradi al secondo (speed 2)
-                {
-                    this.comOutBuf = "Z" + 2;
-                    this.correctingFlag = true;
-                }
-                else if (this.orientCounter < this.timeCorrect && !this.correctingFlag && this.correctSxFlag)
-                {
-                    this.comOutBuf = "C" + 2;
-                    this.correctingFlag = true;
-                }
-                else if(this.orientCounter >= this.timeCorrect)
-                {
-                    this.comOutBuf = "X";
-                    this.correctOrientation = false;
-                    this.correctingFlag = false;
-                }
-                this.orientCounter++;
-            }
-
-
-            if (this.correctTurn)
-            {
-                if(this.timeXTurn == 0) this.corrX = false;
-                if(this.timeYTurn == 0) this.corrY = false;
-
-                if(this.timeXTurn > 0)
-                {
-                    this.timeXTurn--;
-                    if (!corrX && !corrY)
-                    {
-                        this.comOutBuf = "L" + this.roverSpeed;
-                        this.corrX = true;
-                    }  
-                }
-                else if (this.timeXTurn < 0)
-                {
-                    this.timeXTurn++;
-                    if (!corrX && !corrY)
-                    {
-                        this.comOutBuf = "L" + this.roverSpeed;
-                        this.corrX = true;
-                    } 
-                }
-                else if (this.timeYTurn > 0)
-                {
-                    this.timeYTurn--;
-                    if (!corrX && !corrY)
-                    {
-                        this.comOutBuf = "B" + this.roverSpeed;
-                        this.corrY = true;
-                    }                   
-                }
-                else if (this.timeYTurn < 0 && !corrX && !corrY)
-                {
-                    this.timeYTurn++;
-                    if (!corrX && !corrY)
-                    {
-                        this.comOutBuf = "B" + this.roverSpeed;
-                        this.corrY = true;
-                    }
-                    
-                }
-                else if(this.timeXTurn == 0 && this.timeYTurn == 0)
-                {
-                    this.correctTurn = false;
-                    this.comOutBuf = "X";
-                    this.corrX = false;
-                    this.corrY = false;
-                }
-            }
-            */
-
+        { 
             if(comOutBuf != null && serialPort.IsOpen)
                 serialPort.Write(comOutBuf);
             comOutBuf = null;
@@ -304,7 +236,6 @@ namespace roverControl
            if ((e.KeyCode == Keys.W || e.KeyCode == Keys.A || e.KeyCode == Keys.S || e.KeyCode == Keys.D) && this.direction == Direction.none)
             {
                 this.startTargetAngle = this.currentAngle;
-                //this.timerCS.Enabled = true; //messo a true nel form
                 this.testRunning = true;
                 this.timeRotateLeft = 0;
                 this.timeRotateRight = 0;
@@ -424,8 +355,6 @@ namespace roverControl
             if (e.KeyCode == Keys.F || e.KeyCode == Keys.G)
             {
                 comOutBuf = "X";
-                //this.manageEndTurn();
-                //this.beginCountTurning = false;
                 this.turningDirection = Direction.none;
                 this.pressedKeys.Remove(e.KeyCode);
             }
@@ -445,22 +374,19 @@ namespace roverControl
         {
             comOutBuf = "XR";
             this.startAngleGoBack = this.currentAngle;
-            /*
+            
             this.impulseCountForward = 0;
             this.impulseCountRight = 0;
             this.dontRead = true;
 
-            this.countTurning = 0;
-            this.orientCounter = 0;
-            */
         }
 
-        private async void goBackButton_Click(object sender, EventArgs e)
+        private void goBackButton_Click(object sender, EventArgs e)
         {
             this.comOutBuf = "G";
         }
 
-        private async void preciseTurn(int direction, int linearSpeed, double angularRate, double startTurnAngle, int destination)
+        private void preciseTurn(int direction, int linearSpeed, double angularRate, double startTurnAngle, int destination)
         {
             int time_50ms = 0;
             double distYTurn;
@@ -481,6 +407,7 @@ namespace roverControl
                 this.dirBuf[0] = '0';
                 this.dirBuf[1] = '9';
             }
+            
             distYTurn = this.distanceCoeff_speed[linearSpeed - 1, 2] * Math.Pow(direction, 2) + this.distanceCoeff_speed[linearSpeed - 1, 1] * Math.Abs(direction) + this.distanceCoeff_speed[linearSpeed - 1, 0];
 
             if (destination >= 0)
@@ -493,7 +420,7 @@ namespace roverControl
                 this.comOutBuf = "B" + this.roverSpeed.ToString();
                 time_50ms = convertMMtoTime((destination * -1) - (int)Math.Round(distYTurn), this.roverSpeed) / 50;
             }
-
+            
             this.preciseTurnCounter = 0;
 
             while(this.preciseTurnCounter < time_50ms)
@@ -511,7 +438,7 @@ namespace roverControl
                 this.comOutBuf = "E" + this.roverSpeed + new String(this.dirBuf) + new String(this.angSpeedBuf);
             }
 
-            while (Math.Abs(this.currentAngle - finishTurnAngle) > this.ANGLE_OFFSET_TOSPEED * this.roverSpeed)
+            while (Math.Abs(this.currentAngle - finishTurnAngle) > this.ANGLE_OFFSET_TOSPEED * this.roverSpeed) // dipende anche dall'angolo finale non solo dalla velocità
             {
                 Application.DoEvents(); 
             }
@@ -614,67 +541,6 @@ namespace roverControl
             }
         }
 
-        /*
-        if (adjusting)
-        {
-            this.countCs++;
-        }
-        if(this.countCs >= 10)
-        {
-            if (this.timeRotateLeft > 0)
-            {
-               if(this.direction == Direction.forward)
-                    comOutBuf = "Q" + this.roverSpeed.ToString() + "03" + "04"; ////overflow buffer
-               else if(this.direction == Direction.backwards)
-                    comOutBuf = "E" + this.roverSpeed.ToString() + "03" + "04"; ////overflow buffer
-               this.timeRotateLeft--;
-            }
-
-            if (this.timeRotateRight > 0)
-            {
-                if (this.direction == Direction.forward)
-                   comOutBuf = "Q" + this.roverSpeed.ToString() + "09" + "04"; // overflow buffer
-                else if (this.direction == Direction.backwards)
-                    comOutBuf = "E" + this.roverSpeed.ToString() + "09" + "04"; // overflow buffer
-                this.timeRotateRight--;
-            }
-            this.countCs = 0;
-        }
-        if (this.timeRotateLeft == 0 && this.timeRotateRight == 0)
-        {
-            if (this.currentAngle - startTargetAngle > 10.0)
-            {
-                this.adjusting = true;
-                this.countCs = 0;
-                this.angleRotate = Math.Abs(this.currentAngle - startTargetAngle);
-                this.timeRotateLeft = (int)(angleRotate / (float)2.3); // tempo in decimi di secondo                        
-            }
-            else if (this.currentAngle - startTargetAngle < -10.0)
-            {
-                this.adjusting = true;
-                this.countCs = 0;
-                this.angleRotate = Math.Abs(this.currentAngle - startTargetAngle);
-                this.timeRotateRight = (int)(angleRotate / (float)2.3); // tempo in decimi di secondo
-
-            }
-            else if (this.currentAngle - startTargetAngle < 10.0 && this.currentAngle - startTargetAngle > -10.0 && adjusting) //flag adjusting per non intasare il buffer
-            {
-                if(this.direction == Direction.forward) comOutBuf = "F" + this.roverSpeed.ToString();
-                else if(this.direction == Direction.right) comOutBuf = "R" + this.roverSpeed.ToString();
-                else if (this.direction == Direction.backwards) comOutBuf = "B" + this.roverSpeed.ToString();
-                else if (this.direction == Direction.left) comOutBuf = "L" + this.roverSpeed.ToString();
-                else comOutBuf = "X" + this.roverSpeed.ToString();
-                //this.testRunning = false;
-                //this.timerCS.Enabled = false;
-                this.countCs = 0;
-                this.adjusting = false;
-                //this.comOutBuf = "X\n";
-            }
-        }
-        
-    }         
-        }
-    */
         private void directionBox_TextChanged(object sender, EventArgs e)
         {
             int.TryParse(this.directionBox.Text.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out this.directionRov);
