@@ -69,8 +69,10 @@ namespace roverControl
         //
         private double ANGLE_OFFSET_TOSPEED;
         private int distYDestination;
+        private int distXDestination;
         private int preciseTurnCounter;
-        private readonly double[,] distanceCoeff_speed;  //coefficienti della rette che legano la distanza y percorsa con l'angolo fatto per velocità da 0-6
+        private readonly double[,] distanceYCoeff_speed;  //coefficienti della rette che legano la distanza y percorsa con l'angolo fatto per velocità da 0-6
+        private readonly double[] speedTo_curveRadius; //associa ad ogni velocità il raggio di curvatura (in millimetri)
         public ROVER()
         {
             InitializeComponent();
@@ -119,20 +121,24 @@ namespace roverControl
             this.turningDirection = Direction.none;
             this.ANGLE_OFFSET_TOSPEED = 2.7;
             this.distYDestination = 0;
+            this.distXDestination = 0;
             this.preciseTurnCounter = 0;
-            this.distanceCoeff_speed = new double[6, 3];
+            this.distanceYCoeff_speed = new double[6, 3];
+            this.speedTo_curveRadius = new double[6];
 
-            this.distanceCoeff_speed[1, 0] = -46.084;
-            this.distanceCoeff_speed[1, 1] = 14.826;
-            this.distanceCoeff_speed[1, 2] = -0.0806;
+            this.distanceYCoeff_speed[1, 0] = -46.084;
+            this.distanceYCoeff_speed[1, 1] = 14.826;
+            this.distanceYCoeff_speed[1, 2] = -0.0806;
 
-            this.distanceCoeff_speed[4,0] = -28.017;
-            this.distanceCoeff_speed[4,1] = 14.962;
-            this.distanceCoeff_speed[4,2] = -0.082;            
+            this.distanceYCoeff_speed[4,0] = -28.017;
+            this.distanceYCoeff_speed[4,1] = 14.962;
+            this.distanceYCoeff_speed[4,2] = -0.082;            
 
-            this.distanceCoeff_speed[5, 0] = -36.454;
-            this.distanceCoeff_speed[5, 1] = 17.687;
-            this.distanceCoeff_speed[5, 2] = -0.0968;
+            this.distanceYCoeff_speed[5, 0] = -36.454;
+            this.distanceYCoeff_speed[5, 1] = 17.687;
+            this.distanceYCoeff_speed[5, 2] = -0.0968;
+
+            this.speedTo_curveRadius[4] = 550; //millimetri
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -386,54 +392,96 @@ namespace roverControl
             this.comOutBuf = "G";
         }
 
-        private void preciseTurn(int direction, int linearSpeed, double angularRate, double startTurnAngle, int destination)
+        private void preciseTurn(int direction, int linearSpeed, double angularRate, double startTurnAngle, int destinationY, int destinationX)
         {
             int time_50ms = 0;
-            double distYTurn;
+            int distYTurn = 0, distXTurn = 0;
+            int distRemainingX, distRemainingY, distRemaining, distYFinal = 0, distXFinal = 0, s_y = 0, s_x = 0;
+
+            double DEG_TO_RAD = Math.PI / 180;
 
             if (direction > 180) direction -= 360;
 
             double finishTurnAngle = startTurnAngle - direction;
             convertDirection(this.directionRov, this.dirBuf);
-            convertAngularSpeed(this.angularSpeedRov, this.angSpeedBuf);            
+            convertAngularSpeed(this.angularSpeedRov, this.angSpeedBuf);
 
-            if (direction > 0)
+            distYTurn = (int)Math.Round(this.speedTo_curveRadius[linearSpeed - 1] * Math.Sin(Math.Abs(direction * DEG_TO_RAD)));
+            distXTurn = (int)Math.Round(this.speedTo_curveRadius[linearSpeed - 1] * Math.Cos(Math.Abs(direction * DEG_TO_RAD)));
+
+            if (direction >= 0)
             {
                 this.dirBuf[0] = '0';
                 this.dirBuf[1] = '3';
+                distXTurn *= -1;
             }
             else if (direction < 0)
             {
                 this.dirBuf[0] = '0';
                 this.dirBuf[1] = '9';
             }
-            
-            distYTurn = this.distanceCoeff_speed[linearSpeed - 1, 2] * Math.Pow(direction, 2) + this.distanceCoeff_speed[linearSpeed - 1, 1] * Math.Abs(direction) + this.distanceCoeff_speed[linearSpeed - 1, 0];
 
-            if (destination >= 0)
+            if (destinationY < 0) // si invertono dx e dy
+            {
+                distXTurn *= -1;
+                distYTurn *= -1;
+            }
+
+            s_y = destinationY - distYTurn;
+            s_x = destinationX - distXTurn;
+
+            /*
+            distRemainingX = destinationX - distXTurn;
+            //distRemainingY = (destinationY - distyTurn - s_y)   -> s_y = destinationY - distYTurn - distRemainingY;  -> se distRemaining = distYFinal allora si arriva perfettamente
+            if (distRemainingX * Math.Sin(finishTurnAngle * DEG_TO_RAD) > 0) //orientamento finale concorde con distanza rimanente
+            {
+                distYFinal = (int)Math.Round(distRemainingX * Math.Tan(finishTurnAngle * DEG_TO_RAD)); //la distanza che deve rimanere alla fine della svolta per arrivare perfettamente alla destinazione
+                s_y = destinationY - distYTurn - distYFinal;
+                distXFinal = s_x;
+                s_x = 0;
+            }
+            */
+
+            if (s_x > 0)
+            {
+                this.comOutBuf = "R" + this.roverSpeed.ToString();
+                time_50ms = convertMMtoTime(s_x, this.roverSpeed) / 50;
+            }
+            else if (s_x < 0)
+            {
+                this.comOutBuf = "L" + this.roverSpeed.ToString();
+                time_50ms = convertMMtoTime(Math.Abs(s_y), this.roverSpeed) / 50;
+            }
+
+            this.preciseTurnCounter = 0;
+            while (this.preciseTurnCounter < time_50ms)
+            {
+                Application.DoEvents(); //non ferma l'esecuzione di altri thread
+            }
+
+            if (s_y > 0)
             {
                 this.comOutBuf = "F" + this.roverSpeed.ToString();
-                time_50ms = convertMMtoTime(destination - (int)Math.Round(distYTurn), this.roverSpeed) / 50;
+                time_50ms = convertMMtoTime(s_y, this.roverSpeed) / 50;
             }
-            else if (destination < 0)
+            else if (s_y < 0)
             {
                 this.comOutBuf = "B" + this.roverSpeed.ToString();
-                time_50ms = convertMMtoTime((destination * -1) - (int)Math.Round(distYTurn), this.roverSpeed) / 50;
+                time_50ms = convertMMtoTime(Math.Abs(s_y), this.roverSpeed) / 50;
             }
-            
-            this.preciseTurnCounter = 0;
 
+            this.preciseTurnCounter = 0;
             while(this.preciseTurnCounter < time_50ms)
             {
                 Application.DoEvents(); //non ferma l'esecuzione di altri thread
             }
 
-            if(destination >= 0)
+            if(destinationY >= 0)
             {
                 this.comOutBuf = "Q" + this.roverSpeed + new String(this.dirBuf) + new String(this.angSpeedBuf);
             }               
 
-            else if (destination < 0)
+            else if (destinationY < 0)
             {
                 this.comOutBuf = "E" + this.roverSpeed + new String(this.dirBuf) + new String(this.angSpeedBuf);
             }
@@ -442,6 +490,21 @@ namespace roverControl
             {
                 Application.DoEvents(); 
             }
+
+            /*
+            if(distXFinal != 0)
+            {
+                this.comOutBuf = "F" + this.roverSpeed;
+                time_50ms = convertMMtoTime(Math.Abs(distXFinal), this.roverSpeed) / 50;
+            }
+
+            this.preciseTurnCounter = 0;
+            while (this.preciseTurnCounter < time_50ms)
+            {
+                Application.DoEvents(); //non ferma l'esecuzione di altri thread
+            }
+
+            */
 
             this.comOutBuf = "X";
         }
@@ -461,8 +524,13 @@ namespace roverControl
                 this.currentAngle = angle;
                 this.realAngle = angle;
             }
+
             this.comInBufGyro = null;
-            this.gyroPort.DiscardInBuffer();
+            try
+            {
+                this.gyroPort.DiscardInBuffer();
+            }
+            catch { };
 
             while(this.currentAngle - this.lastAngle < -180)
             {
@@ -483,7 +551,7 @@ namespace roverControl
 
         private void startTestButton_Click(object sender, EventArgs e)
         {
-            preciseTurn(this.directionRov,this.roverSpeed,this.angularSpeedRov,this.currentAngle, this.distYDestination);
+            preciseTurn(this.directionRov,this.roverSpeed,this.angularSpeedRov,this.currentAngle, this.distYDestination, this.distXDestination);
         }
 
         private void stopTestButton_Click(object sender, EventArgs e)
@@ -495,7 +563,7 @@ namespace roverControl
         {
             if (testRunning)
             {
-                if (this.currentAngle - this.startTargetAngle > 3.0)
+                if (this.currentAngle - this.startTargetAngle > 2.0)
                 {
                     if (!adjusting)
                     {
@@ -510,7 +578,7 @@ namespace roverControl
                     }
                     this.adjusting = true;
                 }
-                else if (this.currentAngle - this.startTargetAngle < -3.0)
+                else if (this.currentAngle - this.startTargetAngle < -2.0)
                 {
                     if (!adjusting)
                     {
@@ -618,7 +686,12 @@ namespace roverControl
 
         private void distTextBox_TextChanged(object sender, EventArgs e)
         {
-            int.TryParse(this.distTextBox.Text.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out this.distYDestination);
+            int.TryParse(this.distYTextBox.Text.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out this.distYDestination);
+        }
+
+        private void distXTextBox_TextChanged(object sender, EventArgs e)
+        {
+            int.TryParse(this.distXTextBox.Text.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out this.distXDestination);
         }
     }
 }

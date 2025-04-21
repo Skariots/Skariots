@@ -59,10 +59,12 @@
             this.impForwTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.distTextBox = new System.Windows.Forms.TextBox();
-            this.distLabel = new System.Windows.Forms.Label();
+            this.distYTextBox = new System.Windows.Forms.TextBox();
+            this.distYLabel = new System.Windows.Forms.Label();
             this.realAngleTextBox = new System.Windows.Forms.TextBox();
             this.realAngleLabel = new System.Windows.Forms.Label();
+            this.distXTextBox = new System.Windows.Forms.TextBox();
+            this.distXLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // serialPort
@@ -345,24 +347,24 @@
             this.label2.TabIndex = 24;
             this.label2.Text = "right";
             // 
-            // distTextBox
+            // distYTextBox
             // 
-            this.distTextBox.Location = new System.Drawing.Point(615, 376);
-            this.distTextBox.Name = "distTextBox";
-            this.distTextBox.Size = new System.Drawing.Size(100, 22);
-            this.distTextBox.TabIndex = 25;
-            this.distTextBox.Text = "0";
-            this.distTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.distTextBox.TextChanged += new System.EventHandler(this.distTextBox_TextChanged);
+            this.distYTextBox.Location = new System.Drawing.Point(603, 376);
+            this.distYTextBox.Name = "distYTextBox";
+            this.distYTextBox.Size = new System.Drawing.Size(100, 22);
+            this.distYTextBox.TabIndex = 25;
+            this.distYTextBox.Text = "0";
+            this.distYTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.distYTextBox.TextChanged += new System.EventHandler(this.distTextBox_TextChanged);
             // 
-            // distLabel
+            // distYLabel
             // 
-            this.distLabel.AutoSize = true;
-            this.distLabel.Location = new System.Drawing.Point(649, 401);
-            this.distLabel.Name = "distLabel";
-            this.distLabel.Size = new System.Drawing.Size(66, 16);
-            this.distLabel.TabIndex = 26;
-            this.distLabel.Text = "distY /mm";
+            this.distYLabel.AutoSize = true;
+            this.distYLabel.Location = new System.Drawing.Point(637, 401);
+            this.distYLabel.Name = "distYLabel";
+            this.distYLabel.Size = new System.Drawing.Size(66, 16);
+            this.distYLabel.TabIndex = 26;
+            this.distYLabel.Text = "distY /mm";
             // 
             // realAngleTextBox
             // 
@@ -382,15 +384,36 @@
             this.realAngleLabel.TabIndex = 28;
             this.realAngleLabel.Text = "Serial";
             // 
+            // distXTextBox
+            // 
+            this.distXTextBox.Location = new System.Drawing.Point(746, 376);
+            this.distXTextBox.Name = "distXTextBox";
+            this.distXTextBox.Size = new System.Drawing.Size(100, 22);
+            this.distXTextBox.TabIndex = 29;
+            this.distXTextBox.Text = "0";
+            this.distXTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.distXTextBox.TextChanged += new System.EventHandler(this.distXTextBox_TextChanged);
+            // 
+            // distXLabel
+            // 
+            this.distXLabel.AutoSize = true;
+            this.distXLabel.Location = new System.Drawing.Point(781, 400);
+            this.distXLabel.Name = "distXLabel";
+            this.distXLabel.Size = new System.Drawing.Size(65, 16);
+            this.distXLabel.TabIndex = 30;
+            this.distXLabel.Text = "distX /mm";
+            // 
             // ROVER
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(964, 570);
+            this.Controls.Add(this.distXLabel);
+            this.Controls.Add(this.distXTextBox);
             this.Controls.Add(this.realAngleLabel);
             this.Controls.Add(this.realAngleTextBox);
-            this.Controls.Add(this.distLabel);
-            this.Controls.Add(this.distTextBox);
+            this.Controls.Add(this.distYLabel);
+            this.Controls.Add(this.distYTextBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.impForwTextBox);
@@ -460,10 +483,12 @@
         private System.Windows.Forms.TextBox impForwTextBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox distTextBox;
-        private System.Windows.Forms.Label distLabel;
+        private System.Windows.Forms.TextBox distYTextBox;
+        private System.Windows.Forms.Label distYLabel;
         private System.Windows.Forms.TextBox realAngleTextBox;
         private System.Windows.Forms.Label realAngleLabel;
+        private System.Windows.Forms.TextBox distXTextBox;
+        private System.Windows.Forms.Label distXLabel;
     }
 }
 
