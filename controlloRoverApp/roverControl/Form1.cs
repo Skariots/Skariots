@@ -71,8 +71,8 @@ namespace roverControl
         private int distYDestination;
         private int distXDestination;
         private int preciseTurnCounter;
-        private readonly double[,] distanceYCoeff_speed;  //coefficienti della rette che legano la distanza y percorsa con l'angolo fatto per velocità da 0-6
-        private readonly double[] speedTo_curveRadius; //associa ad ogni velocità il raggio di curvatura (in millimetri)
+        private readonly double[] speedTo_curveRadiusX; //associa ad ogni velocità il raggio di curvatura in x (in millimetri)
+        private readonly double[] speedTo_curveRadiusY; //associa ad ogni velocità il raggio di curvatura in y (in millimetri)
         public ROVER()
         {
             InitializeComponent();
@@ -123,22 +123,20 @@ namespace roverControl
             this.distYDestination = 0;
             this.distXDestination = 0;
             this.preciseTurnCounter = 0;
-            this.distanceYCoeff_speed = new double[6, 3];
-            this.speedTo_curveRadius = new double[6];
+            this.speedTo_curveRadiusX = new double[6];
+            this.speedTo_curveRadiusY = new double[6];
 
-            this.distanceYCoeff_speed[1, 0] = -46.084;
-            this.distanceYCoeff_speed[1, 1] = 14.826;
-            this.distanceYCoeff_speed[1, 2] = -0.0806;
+            this.speedTo_curveRadiusX[1] = 530; //millimetri
+            this.speedTo_curveRadiusY[1] = 690; //millimetri
 
-            this.distanceYCoeff_speed[4,0] = -28.017;
-            this.distanceYCoeff_speed[4,1] = 14.962;
-            this.distanceYCoeff_speed[4,2] = -0.082;            
+            this.speedTo_curveRadiusX[2] = 525; //millimetri
+            this.speedTo_curveRadiusY[2] = 675; //millimetri
 
-            this.distanceYCoeff_speed[5, 0] = -36.454;
-            this.distanceYCoeff_speed[5, 1] = 17.687;
-            this.distanceYCoeff_speed[5, 2] = -0.0968;
+            this.speedTo_curveRadiusX[3] = 524; //millimetri
+            this.speedTo_curveRadiusY[3] = 681; //millimetri
 
-            this.speedTo_curveRadius[4] = 550; //millimetri
+            this.speedTo_curveRadiusX[4] = 550; //millimetri
+            this.speedTo_curveRadiusY[4] = 710; //millimetri
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -406,8 +404,8 @@ namespace roverControl
             convertDirection(this.directionRov, this.dirBuf);
             convertAngularSpeed(this.angularSpeedRov, this.angSpeedBuf);
 
-            distYTurn = (int)Math.Round(this.speedTo_curveRadius[linearSpeed - 1] * Math.Sin(Math.Abs(direction * DEG_TO_RAD)));
-            distXTurn = (int)Math.Round(this.speedTo_curveRadius[linearSpeed - 1] * Math.Cos(Math.Abs(direction * DEG_TO_RAD)));
+            distYTurn = (int)Math.Round(this.speedTo_curveRadiusY[linearSpeed - 1] * Math.Sin(Math.Abs(direction * DEG_TO_RAD)));
+            distXTurn = (int)Math.Round(this.speedTo_curveRadiusX[linearSpeed - 1] * (1 - Math.Cos(Math.Abs(direction * DEG_TO_RAD))));
 
             if (direction >= 0)
             {
