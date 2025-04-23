@@ -78,6 +78,7 @@ int currentCommandTrack; //indice corrente nel vettore di comandi
 int commandTimerTrack; //contatore per il tempo
 int commandStarted; //flag che indica se si deve cominciare a contare il tempo (appena arriva il primo comando)
 int resetCommandsFlag; //flag attivato da un comando da seriale (resetta il punto di partenza)
+uint8_t lastCommandValues[5];
 
 typedef struct{
   float a;
@@ -156,9 +157,13 @@ int main(void)
   
   while (1)
   {
-    if(moveTick >= 100 && numBytesIN > 0){ // > 1 per il \n aggiunto su seriale
+    if(numBytesIN == 0) 
+      moveTick = 0;
+    
+    else if(moveTick >= 15){ // > 1 per il \n aggiunto su seriale
       if(comINbuf[strlen(comINbuf)-1] == '\n') comINbuf[strlen(comINbuf)-1] = '\0'; // strip del \n
       //strcpy(comOUTbuf,comINbuf);
+      //sscanf(comINbuf,"%*[^:]:%d",&dataNumber);
       sprintf(comOUTbuf,"c%s\nf%d\nr%d\n",comINbuf,impulseCountEngForw,impulseCountEngRight);
       strcpy(bufCheck,comINbuf);
       errorCommandRover = checkCommandRov(bufCheck,&timeRov,&speedRov,&direction_rov,&angular_rate_rov);  
@@ -175,7 +180,7 @@ int main(void)
       
       //strcpy(comINbuf,"");
     }
-    
+    /*
     if(numBytesIN >= 10){  // > 10 per non entrare con i comandi del rover
       //comINbuf[3]=0; //ha problemi con il buffer per la rotazione
       errorCommand = checkCommand(comINbuf);
@@ -192,6 +197,7 @@ int main(void)
       }
       numBytesIN = 0;
     }
+    */
     if(speedArray[0] == 's' && ledState[0] == off){
         HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin,GPIO_PIN_SET);
         ledState[0] = on;
@@ -545,6 +551,8 @@ void speedConvert(float *speed){
   
 int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag, int backTracking){
       uint8_t bufOut[5];
+      int lastCommandCheck = 1;
+      
       if(stopFlag) {
         Init_RovBuf(commandBufOutRov);
       }
@@ -558,18 +566,33 @@ int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag, int bac
       
       if(commandStarted && !backTracking) backTrackingCommands[currentCommandTrack-1].time = commandTimerTrack;
         
-      commandTimerTrack = 0; //reset del contatore (sempre)
+      //commandTimerTrack = 0; //reset del contatore (sempre) non va più bene
       
       if(!commandStarted) commandStarted = 1; //attiva il contatore  (commandStarted deve riattivarsi durante il backTracking)  
       
       HAL_I2C_Master_Transmit_IT(&hi2c1,0x34 << 1,bufOut,sizeof(uint8_t) * 5);  //trasmissione dei dati messa in mezzo al codice per il backtrack per minimizzare i ritardi
       
+      for(int i=0;i<5;i++){
+        if(lastCommandValues[i] != bufOut[i])
+          lastCommandCheck = 0;
+      }
+      
+      for(int i=0;i<5;i++){
+        lastCommandValues[i] = bufOut[i];
+      }
+        
       if(bufOut[1] == 0 && bufOut[2] == 0 && bufOut[3] == 0 && bufOut[4] == 0){
         commandStarted = 0;
         commandTimerTrack = 0;
         return 1;
       }
       
+      if(lastCommandCheck)
+        return 1;
+      else 
+        commandTimerTrack = 0;
+        
+        
       if(backTracking) return 2;
       
       backTrackingCommands[currentCommandTrack].v0 = bufOut[1];

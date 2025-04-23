@@ -65,6 +65,8 @@
             this.realAngleLabel = new System.Windows.Forms.Label();
             this.distXTextBox = new System.Windows.Forms.TextBox();
             this.distXLabel = new System.Windows.Forms.Label();
+            this.goBackFastButton = new System.Windows.Forms.Button();
+            this.dataReceivedBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // serialPort
@@ -95,7 +97,7 @@
             // 
             // commandTimer
             // 
-            this.commandTimer.Interval = 50;
+            this.commandTimer.Interval = 25;
             this.commandTimer.Tick += new System.EventHandler(this.commandTimer_Tick);
             // 
             // forwardButton
@@ -397,17 +399,39 @@
             // distXLabel
             // 
             this.distXLabel.AutoSize = true;
-            this.distXLabel.Location = new System.Drawing.Point(781, 400);
+            this.distXLabel.Location = new System.Drawing.Point(781, 401);
             this.distXLabel.Name = "distXLabel";
             this.distXLabel.Size = new System.Drawing.Size(65, 16);
             this.distXLabel.TabIndex = 30;
             this.distXLabel.Text = "distX /mm";
+            // 
+            // goBackFastButton
+            // 
+            this.goBackFastButton.Location = new System.Drawing.Point(200, 141);
+            this.goBackFastButton.Name = "goBackFastButton";
+            this.goBackFastButton.Size = new System.Drawing.Size(100, 43);
+            this.goBackFastButton.TabIndex = 31;
+            this.goBackFastButton.Text = "GO BACK FAST";
+            this.goBackFastButton.UseVisualStyleBackColor = true;
+            this.goBackFastButton.Click += new System.EventHandler(this.goBackFastButton_Click);
+            // 
+            // dataReceivedBox
+            // 
+            this.dataReceivedBox.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.dataReceivedBox.Location = new System.Drawing.Point(481, 109);
+            this.dataReceivedBox.Multiline = true;
+            this.dataReceivedBox.Name = "dataReceivedBox";
+            this.dataReceivedBox.ReadOnly = true;
+            this.dataReceivedBox.Size = new System.Drawing.Size(249, 169);
+            this.dataReceivedBox.TabIndex = 32;
             // 
             // ROVER
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(964, 570);
+            this.Controls.Add(this.dataReceivedBox);
+            this.Controls.Add(this.goBackFastButton);
             this.Controls.Add(this.distXLabel);
             this.Controls.Add(this.distXTextBox);
             this.Controls.Add(this.realAngleLabel);
@@ -489,6 +513,8 @@
         private System.Windows.Forms.Label realAngleLabel;
         private System.Windows.Forms.TextBox distXTextBox;
         private System.Windows.Forms.Label distXLabel;
+        private System.Windows.Forms.Button goBackFastButton;
+        private System.Windows.Forms.TextBox dataReceivedBox;
     }
 }
 
