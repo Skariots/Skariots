@@ -67,6 +67,7 @@
             this.distXLabel = new System.Windows.Forms.Label();
             this.goBackFastButton = new System.Windows.Forms.Button();
             this.dataReceivedBox = new System.Windows.Forms.TextBox();
+            this.angleDebugBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // serialPort
@@ -425,11 +426,21 @@
             this.dataReceivedBox.Size = new System.Drawing.Size(249, 169);
             this.dataReceivedBox.TabIndex = 32;
             // 
+            // angleDebugBox
+            // 
+            this.angleDebugBox.Location = new System.Drawing.Point(391, 81);
+            this.angleDebugBox.Name = "angleDebugBox";
+            this.angleDebugBox.ReadOnly = true;
+            this.angleDebugBox.Size = new System.Drawing.Size(90, 22);
+            this.angleDebugBox.TabIndex = 33;
+            this.angleDebugBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
             // ROVER
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(964, 570);
+            this.Controls.Add(this.angleDebugBox);
             this.Controls.Add(this.dataReceivedBox);
             this.Controls.Add(this.goBackFastButton);
             this.Controls.Add(this.distXLabel);
@@ -515,6 +526,7 @@
         private System.Windows.Forms.Label distXLabel;
         private System.Windows.Forms.Button goBackFastButton;
         private System.Windows.Forms.TextBox dataReceivedBox;
+        private System.Windows.Forms.TextBox angleDebugBox;
     }
 }
 

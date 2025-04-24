@@ -25,13 +25,12 @@ namespace roverControl
         private Byte[] tmpGyro;
         private int roverSpeed;
         private HashSet<Keys> pressedKeys;
-        private float startTargetAngle;
+        private double startTargetAngle;
         private float []anglesReceived;
         private float currentAngle;
         private float realAngle;
         private float lastAngle;
         private Boolean testRunning;
-        private Boolean adjusting;
         private Boolean simulationStartFlag;
         private int directionRov;
         private float angularSpeedRov;
@@ -80,6 +79,8 @@ namespace roverControl
         private int backTrackingCounter;
 
         private String dataReceivedText;
+        private double angleD;
+        private double beforeTurnAngle;
         public ROVER()
         {
             InitializeComponent();
@@ -96,7 +97,6 @@ namespace roverControl
             this.lastAngle = 0;
             this.startTargetAngle = 0;
             this.testRunning = false; ////////////////////////////////////////////
-            this.adjusting = false;
             this.simulationStartFlag = false;
             this.timerCS.Enabled = true;
             this.countCs = 0;
@@ -149,6 +149,9 @@ namespace roverControl
             this.total_dy = 0;
             this.backTrackingFlag = false;
             this.backTrackingCounter = 0;
+
+            this.angleD = 0;
+            this.beforeTurnAngle = 0;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -245,6 +248,12 @@ namespace roverControl
             {
                 serialPort.Write(comOutBuf + ":" + this.dataNumber);
                 this.dataNumber++;
+
+                if (this.comOutBuf[0] == 'F') this.direction = Direction.forward;
+                else if (this.comOutBuf[0] == 'B') this.direction = Direction.backwards;
+                else if (this.comOutBuf[0] == 'L') this.direction = Direction.left;
+                else if (this.comOutBuf[0] == 'R') this.direction = Direction.right;
+                else if (this.comOutBuf[0] == 'Q' || this.comOutBuf[0] == 'E' || this.comOutBuf[0] == 'Z' || this.comOutBuf[0] == 'C') this.direction = Direction.turning;
             }
 
             if(this.dataReceivedText != null)
@@ -260,6 +269,7 @@ namespace roverControl
             if(this.dataNumber > 100) 
                this.dataNumber = 0;
 
+            this.angleDebugBox.Text = this.angleD.ToString();
             /*
             if (this.correctOrientation)
             {
@@ -336,60 +346,62 @@ namespace roverControl
             if (e.KeyCode == Keys.W && this.pressedKeys.Count == 0)
             {
                 comOutBuf = "F" + this.roverSpeed;
-                this.direction = Direction.forward;
+                //this.direction = Direction.forward;
                 this.forwardButton.BackColor = Color.LightGray;
                 this.pressedKeys.Add(e.KeyCode);
             }
             if (e.KeyCode == Keys.A && this.pressedKeys.Count == 0)
             {
                 comOutBuf = "L" + this.roverSpeed;
-                this.direction = Direction.left;
+                //this.direction = Direction.left;
                 this.leftButton.BackColor = Color.LightGray;
                 this.pressedKeys.Add(e.KeyCode);
             }
             if (e.KeyCode == Keys.S && this.pressedKeys.Count == 0)
             {
                 comOutBuf = "B" + this.roverSpeed;
-                this.direction = Direction.backwards;
+                //this.direction = Direction.backwards;
                 this.backwardsButton.BackColor = Color.LightGray;
                 this.pressedKeys.Add(e.KeyCode);
             }
             if (e.KeyCode == Keys.D && this.pressedKeys.Count == 0)
             {
                 comOutBuf = "R" + this.roverSpeed;
-                this.direction = Direction.right;
+                //this.direction = Direction.right;
                 this.rightButton.BackColor = Color.LightGray;
                 this.pressedKeys.Add(e.KeyCode);
             }
             if (e.KeyCode == Keys.Q && this.pressedKeys.Count == 0)
             {
                 comOutBuf = "Z" + this.roverSpeed;
-                this.direction = Direction.turning;
+                //this.direction = Direction.turning;
                 this.rotateLeftButton.BackColor = Color.LightGray;
                 this.pressedKeys.Add(e.KeyCode);
             }
             if (e.KeyCode == Keys.E && this.pressedKeys.Count == 0)
             {
                 comOutBuf = "C" + this.roverSpeed;
-                this.direction = Direction.turning;
+                //this.direction = Direction.turning;
                 this.rotateRightButton.BackColor = Color.LightGray;
                 this.pressedKeys.Add(e.KeyCode);
             }
 
             if (e.KeyCode == Keys.F && this.pressedKeys.Count == 0)
             {
+                this.beforeTurnAngle = this.currentAngle;
                 comOutBuf = "Q" + this.roverSpeed + new String(this.dirBuf) + new String(this.angSpeedBuf);
                 this.beginCountTurning = true;
-                this.direction = Direction.turning;
+                //this.direction = Direction.turning;
                 this.turningDirection = Direction.forward;
                 this.pressedKeys.Add(e.KeyCode);
             }
 
             if (e.KeyCode == Keys.G && this.pressedKeys.Count == 0)
             {
+                this.beforeTurnAngle = this.currentAngle;
                 comOutBuf = "E" + this.roverSpeed + new String(this.dirBuf) + new String(this.angSpeedBuf);
                 this.beginCountTurning = true;
-                this.direction = Direction.turning;
+                //this.direction = Direction.turning;
                 this.turningDirection = Direction.backwards;
                 this.pressedKeys.Add(e.KeyCode);
             }
@@ -412,7 +424,7 @@ namespace roverControl
                 }
             }
         }
-        private void ROVER_KeyUp(object sender, KeyEventArgs e)
+        private async void ROVER_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
@@ -451,10 +463,11 @@ namespace roverControl
             {
                 comOutBuf = "X";
                 this.turningDirection = Direction.none;
+                this.pressedKeys.Remove(e.KeyCode);
+                await Task.Delay(500);
                 UpdateDistanceEndTurn();
                 this.beginCountTurning = false;
-                this.countTurning = 0;
-                this.pressedKeys.Remove(e.KeyCode);
+                this.countTurning = 0;  
             }
 
             if (e.KeyCode == Keys.P)
@@ -469,6 +482,7 @@ namespace roverControl
             this.startAngleGoBack = this.currentAngle;
             this.total_dx = 0;
             this.total_dy = 0;
+            this.backTrackingCounter = 0;
             this.backTrackingFlag = false;
 
             //non servono più
@@ -603,18 +617,25 @@ namespace roverControl
 
         private void UpdateDistanceEndTurn()
         {
-            double seconds = (double)this.countTurning * 25 / 1000;
+            //double seconds = (double)this.countTurning * 25 / 1000;
             double dx, dy, angle;
-            
-            angle = this.angularSpeedRov * seconds;
 
+            //angle = this.angularSpeedRov * seconds;
+
+            angle = this.beforeTurnAngle - this.currentAngle;
+            this.angleD = angle;
+
+            double DEG_TO_RAD = Math.PI / 180;
+
+            /*
             if (this.directionRov > 180)
             {
                 angle *= -1;
             }
+            */
 
-            dy = (int)Math.Round(this.speedTo_curveRadiusY[this.roverSpeed - 1] * Math.Sin(Math.Abs(angle)));
-            dx = (int)Math.Round(this.speedTo_curveRadiusX[this.roverSpeed - 1] * (1 - Math.Cos(Math.Abs(angle))));
+            dy = (int)Math.Round(this.speedTo_curveRadiusY[this.roverSpeed - 1] * Math.Sin(Math.Abs(angle * DEG_TO_RAD)));
+            dx = (int)Math.Round(this.speedTo_curveRadiusX[this.roverSpeed - 1] * (1 - Math.Cos(Math.Abs(angle * DEG_TO_RAD))));
 
             if (this.directionRov < 180)
             {
@@ -685,49 +706,39 @@ namespace roverControl
         {
             if (testRunning)
             {
-                if (this.currentAngle - this.startTargetAngle > 2.0)
+                if (this.currentAngle - this.startTargetAngle > 1.0)
                 {
-                    if (!adjusting)
-                    {
-                        if (this.direction == Direction.forward)
-                            comOutBuf = "N" + this.roverSpeed.ToString() + "F";
-                        else if (this.direction == Direction.right)
-                            comOutBuf = "N" + this.roverSpeed.ToString() + "R";
-                        else if (this.direction == Direction.backwards)
-                            comOutBuf = "N" + this.roverSpeed.ToString() + "B";
-                        else if (this.direction == Direction.left)
-                            comOutBuf = "N" + this.roverSpeed.ToString() + "L";
-                    }
-                    this.adjusting = true;
+                    if (this.direction == Direction.forward)
+                        comOutBuf = "N" + this.roverSpeed.ToString() + "F";
+                    else if (this.direction == Direction.right)
+                        comOutBuf = "N" + this.roverSpeed.ToString() + "R";
+                    else if (this.direction == Direction.backwards)
+                        comOutBuf = "N" + this.roverSpeed.ToString() + "B";
+                    else if (this.direction == Direction.left)
+                        comOutBuf = "N" + this.roverSpeed.ToString() + "L";
                 }
-                else if (this.currentAngle - this.startTargetAngle < -2.0)
+                else if (this.currentAngle - this.startTargetAngle < -1.0)
                 {
-                    if (!adjusting)
-                    {
-                        if (direction == Direction.forward)
-                            comOutBuf = "M" + this.roverSpeed.ToString() + "F";
-                        else if (direction == Direction.right)
-                            comOutBuf = "M" + this.roverSpeed.ToString() + "R";
-                        else if (direction == Direction.backwards)
-                            comOutBuf = "M" + this.roverSpeed.ToString() + "B";
-                        else if (direction == Direction.left)
-                            comOutBuf = "M" + this.roverSpeed.ToString() + "L";
-                    }
-                    this.adjusting = true;
+                    if (direction == Direction.forward)
+                        comOutBuf = "M" + this.roverSpeed.ToString() + "F";
+                    else if (direction == Direction.right)
+                        comOutBuf = "M" + this.roverSpeed.ToString() + "R";
+                    else if (direction == Direction.backwards)
+                        comOutBuf = "M" + this.roverSpeed.ToString() + "B";
+                    else if (direction == Direction.left)
+                         comOutBuf = "M" + this.roverSpeed.ToString() + "L";
                 }
-                else if(this.adjusting)
+                else
                 {
                     if (direction == Direction.forward)
                         comOutBuf = "F" + this.roverSpeed.ToString();
-                    if (direction == Direction.right)
+                    else if (direction == Direction.right)
                         comOutBuf = "R" + this.roverSpeed.ToString();
-                    if (direction == Direction.backwards)
+                    else if (direction == Direction.backwards)
                         comOutBuf = "B" + this.roverSpeed.ToString();
-                    if (direction == Direction.left)
+                    else if (direction == Direction.left)
                         comOutBuf = "L" + this.roverSpeed.ToString();
-
-                    this.adjusting = false;
-                }
+                }            
             }
         }
 
@@ -824,10 +835,8 @@ namespace roverControl
             this.orientCounter = 0;
             this.correctOrientation = true;
 
-            //this.timeCorrect = (int)((this.currentAngle - (this.startAngleGoBack * -1)) * 20 / 37);  //  20/37 -> tempo per fare un grado
 
             double finalAngle = this.startAngleGoBack - 180;
-            //double corrAngle = this.currentAngle - finalAngle;
 
             if(finalAngle > this.currentAngle)
             {
@@ -850,7 +859,11 @@ namespace roverControl
                 }
                 Application.DoEvents();
             }
-       
+
+            //correzione della direzione
+            this.startTargetAngle = finalAngle;
+            this.testRunning = true;
+
             this.total_dx *= -1;
             this.total_dy *= -1;
 
@@ -886,9 +899,10 @@ namespace roverControl
                 Application.DoEvents();
             }
 
-            this.comOutBuf = "XR";
-            this.backTrackingCounter = 0;
-            this.backTrackingFlag = false;
+            resetButton_Click(null,null);
+
+            //fine correzione della direzione
+            this.testRunning = false;
         }
     }
 }
