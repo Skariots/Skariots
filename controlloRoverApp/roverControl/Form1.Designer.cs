@@ -334,21 +334,21 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(790, 180);
+            this.label1.Location = new System.Drawing.Point(824, 180);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(56, 16);
+            this.label1.Size = new System.Drawing.Size(22, 16);
             this.label1.TabIndex = 23;
-            this.label1.Text = "Forward";
+            this.label1.Text = "dy";
             // 
             // label2
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(814, 227);
+            this.label2.Location = new System.Drawing.Point(825, 230);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(32, 16);
+            this.label2.Size = new System.Drawing.Size(21, 16);
             this.label2.TabIndex = 24;
-            this.label2.Text = "right";
+            this.label2.Text = "dx";
             // 
             // distYTextBox
             // 
