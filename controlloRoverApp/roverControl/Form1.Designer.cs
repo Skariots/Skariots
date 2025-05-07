@@ -68,6 +68,11 @@
             this.goBackFastButton = new System.Windows.Forms.Button();
             this.dataReceivedBox = new System.Windows.Forms.TextBox();
             this.angleDebugBox = new System.Windows.Forms.TextBox();
+            this.dyTextBox = new System.Windows.Forms.TextBox();
+            this.dxTextBox = new System.Windows.Forms.TextBox();
+            this.impYLabel = new System.Windows.Forms.Label();
+            this.impXLabel = new System.Windows.Forms.Label();
+            this.goBackImpulseButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // serialPort
@@ -313,7 +318,7 @@
             // impRigTextBox
             // 
             this.impRigTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.impRigTextBox.Location = new System.Drawing.Point(852, 224);
+            this.impRigTextBox.Location = new System.Drawing.Point(852, 162);
             this.impRigTextBox.Name = "impRigTextBox";
             this.impRigTextBox.Size = new System.Drawing.Size(100, 22);
             this.impRigTextBox.TabIndex = 21;
@@ -323,7 +328,7 @@
             // impForwTextBox
             // 
             this.impForwTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.impForwTextBox.Location = new System.Drawing.Point(852, 174);
+            this.impForwTextBox.Location = new System.Drawing.Point(852, 123);
             this.impForwTextBox.Name = "impForwTextBox";
             this.impForwTextBox.Size = new System.Drawing.Size(100, 22);
             this.impForwTextBox.TabIndex = 22;
@@ -334,7 +339,7 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(824, 180);
+            this.label1.Location = new System.Drawing.Point(826, 207);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(22, 16);
             this.label1.TabIndex = 23;
@@ -344,7 +349,7 @@
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(825, 230);
+            this.label2.Location = new System.Drawing.Point(826, 247);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(21, 16);
             this.label2.TabIndex = 24;
@@ -435,11 +440,66 @@
             this.angleDebugBox.TabIndex = 33;
             this.angleDebugBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
+            // dyTextBox
+            // 
+            this.dyTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.dyTextBox.Location = new System.Drawing.Point(852, 202);
+            this.dyTextBox.Name = "dyTextBox";
+            this.dyTextBox.Size = new System.Drawing.Size(100, 22);
+            this.dyTextBox.TabIndex = 34;
+            this.dyTextBox.Text = "0";
+            this.dyTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // dxTextBox
+            // 
+            this.dxTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.dxTextBox.Location = new System.Drawing.Point(852, 241);
+            this.dxTextBox.Name = "dxTextBox";
+            this.dxTextBox.Size = new System.Drawing.Size(100, 22);
+            this.dxTextBox.TabIndex = 35;
+            this.dxTextBox.Text = "0";
+            this.dxTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // impYLabel
+            // 
+            this.impYLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.impYLabel.AutoSize = true;
+            this.impYLabel.Location = new System.Drawing.Point(811, 129);
+            this.impYLabel.Name = "impYLabel";
+            this.impYLabel.Size = new System.Drawing.Size(38, 16);
+            this.impYLabel.TabIndex = 36;
+            this.impYLabel.Text = "impY";
+            // 
+            // impXLabel
+            // 
+            this.impXLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.impXLabel.AutoSize = true;
+            this.impXLabel.Location = new System.Drawing.Point(811, 165);
+            this.impXLabel.Name = "impXLabel";
+            this.impXLabel.Size = new System.Drawing.Size(37, 16);
+            this.impXLabel.TabIndex = 37;
+            this.impXLabel.Text = "impX";
+            // 
+            // goBackImpulseButton
+            // 
+            this.goBackImpulseButton.Location = new System.Drawing.Point(94, 184);
+            this.goBackImpulseButton.Name = "goBackImpulseButton";
+            this.goBackImpulseButton.Size = new System.Drawing.Size(100, 46);
+            this.goBackImpulseButton.TabIndex = 38;
+            this.goBackImpulseButton.Text = "IMPULSE GO BACK";
+            this.goBackImpulseButton.UseVisualStyleBackColor = true;
+            this.goBackImpulseButton.Click += new System.EventHandler(this.goBackImpulseButton_Click);
+            // 
             // ROVER
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(964, 570);
+            this.Controls.Add(this.goBackImpulseButton);
+            this.Controls.Add(this.impXLabel);
+            this.Controls.Add(this.impYLabel);
+            this.Controls.Add(this.dxTextBox);
+            this.Controls.Add(this.dyTextBox);
             this.Controls.Add(this.angleDebugBox);
             this.Controls.Add(this.dataReceivedBox);
             this.Controls.Add(this.goBackFastButton);
@@ -527,6 +587,11 @@
         private System.Windows.Forms.Button goBackFastButton;
         private System.Windows.Forms.TextBox dataReceivedBox;
         private System.Windows.Forms.TextBox angleDebugBox;
+        private System.Windows.Forms.TextBox dyTextBox;
+        private System.Windows.Forms.TextBox dxTextBox;
+        private System.Windows.Forms.Label impYLabel;
+        private System.Windows.Forms.Label impXLabel;
+        private System.Windows.Forms.Button goBackImpulseButton;
     }
 }
 

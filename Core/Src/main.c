@@ -4,7 +4,7 @@
 #define DEVICE_ADDRESS 0x34
 #define OFFSET_TO_SPEED 0.20
 #define PI 3.14159265
-#define NCOMMANDS 500
+#define NCOMMANDS 10000
 
 void SystemClock_Config(void);
 static void MPU_Config(void);
@@ -57,6 +57,7 @@ int messageTransmitted = 0;
 int impulseCountEngForw;
 int impulseCountEngRight;
 int impulseResetFlag;
+int invertImpulseFlag;
 int commandReceivedFlag;  //flag di interruzione se si riceve un comando durante il goBack()
 int checkRx;
 Direction roverDirection;
@@ -152,6 +153,7 @@ int main(void)
   currentCommandTrack = 0;
   commandTimerTrack = 0;
   commandStarted = 0;
+  invertImpulseFlag = 0;
   
   HAL_UART_Receive_IT(&huart3,comINbuf,1); //riceve il primo byte e fa scattare interrupt
   
@@ -277,6 +279,14 @@ int checkCommandRov(char *str,int *time, int *speed,int *direction_rov, float *a
     return error;
   }
   
+  //per quando faccio il backTracking dall'applicazione (carattere I aggiunto nel buffer)
+  if(strlen(str) >= 4 && str[3] == 'I'){
+    invertImpulseFlag = 1;
+  }
+  else{
+    invertImpulseFlag = 0;
+  }
+  
   if(str[0] == 'M' || str[0] == 'N'){
     if(strlen(str) < 3 || (str[2] != 'F' && str[2] != 'R' && str[2] != 'B' && str[2] != 'L')){
       error = 1;
@@ -313,7 +323,7 @@ int checkCommandRov(char *str,int *time, int *speed,int *direction_rov, float *a
 void TranslateCommand(char *str,uint8_t comBufOutRov[][RXSIZEBUF],int speed, int direction_rov, float angular_rate_rov){
   //speed valori da 0 a 9 -> solo valori positivi della velocità 0-> 130 9->255
   
-  //0 -> dx dietro, 1 -> dx avanti, 2 -> sx dietro, 3 -> sx avanti
+  //numeri ruote: 0 -> dx dietro, 1 -> dx avanti, 2 -> sx dietro, 3 -> sx avanti
   int realSpeed = (speed * 10) % 91;
   
   if(str[0] == 'G'){
@@ -563,6 +573,16 @@ int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag, int bac
       bufOut[3] = commandBufOutRov[2][1];
       bufOut[4] = commandBufOutRov[3][1];       
       
+      if(bufOut[1] > 127 && bufOut[3] > 127) roverDirection = left;
+      else if(bufOut[1] > 0 && bufOut[3] > 127) roverDirection = forward;
+      else if(bufOut[1] > 127 && bufOut[3] > 0) roverDirection = backwards;  
+      else if(bufOut[1] > 0 && bufOut[3] > 0) roverDirection = right;
+      else roverDirection = none;
+      
+      if(dontCountImpulse){ //utilizzato quando si gira e quando si ruota su se stessi
+        roverDirection = none;
+      }
+      dontCountImpulse = 0;
       
       if(commandStarted && !backTracking) backTrackingCommands[currentCommandTrack-1].time = commandTimerTrack;
         
@@ -580,7 +600,13 @@ int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag, int bac
       for(int i=0;i<5;i++){
         lastCommandValues[i] = bufOut[i];
       }
-        
+      
+      if(impulseResetFlag) {
+        impulseCountEngForw = 0;
+        impulseCountEngRight = 0;
+        impulseResetFlag = 0;
+      }
+      
       if(bufOut[1] == 0 && bufOut[2] == 0 && bufOut[3] == 0 && bufOut[4] == 0){
         commandStarted = 0;
         commandTimerTrack = 0;
@@ -602,22 +628,6 @@ int TransmitCommand(uint8_t commandBufOutRov[][RXSIZEBUF], int stopFlag, int bac
       
       currentCommandTrack ++;
       
-      if(impulseResetFlag) {
-        impulseCountEngForw = 0;
-        impulseCountEngRight = 0;
-        impulseResetFlag = 0;
-      }
-      
-      if(bufOut[1] > 90 && bufOut[3] > 90) roverDirection = left;
-      else if(bufOut[1] > 0 && bufOut[3] > 90) roverDirection = forward;
-      else if(bufOut[1] > 90 && bufOut[3] > 0) roverDirection = backwards;  
-      else if(bufOut[1] > 0 && bufOut[3] > 0) roverDirection = right;
-      else roverDirection = none;
-      
-      if(dontCountImpulse){ //utilizzato quando si gira e quando si ruota su se stessi
-        roverDirection = none;
-      }
-      dontCountImpulse = 0;
 }
 int checkCommand(char *str){
   errorCommand = 0;
@@ -856,16 +866,24 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     if (GPIO_Pin == GPIO_PIN_3 && HAL_GPIO_ReadPin(ENG_GPIO_Port,GPIO_Pin) == GPIO_PIN_SET && roverDirection != none)
     {
       if(roverDirection == forward){
-        impulseCountEngForw++;
+        if(!invertImpulseFlag)
+          impulseCountEngForw ++;
+        else impulseCountEngForw --;
       }
       else if(roverDirection == backwards){
-        impulseCountEngForw--;
+        if(!invertImpulseFlag)
+          impulseCountEngForw --;
+        else impulseCountEngForw ++;
       }
       else if(roverDirection == right){
-        impulseCountEngRight++;
+        if(!invertImpulseFlag)
+          impulseCountEngRight ++;
+        else impulseCountEngRight --;
       }
       else if(roverDirection == left){
-        impulseCountEngRight--;
+        if(!invertImpulseFlag)
+          impulseCountEngRight --;
+        else impulseCountEngRight ++;
       }
     }
 }
